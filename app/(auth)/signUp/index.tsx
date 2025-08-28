@@ -1,0 +1,252 @@
+import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import {
+  Image,
+  Pressable,
+  SafeAreaView,
+  StatusBar,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+// import { z } from "zod";
+// import { zodResolver } from "@hookform/resolvers/zod";
+
+import { useLocalSearchParams, useRouter } from "expo-router";
+
+import Checkbox from "../../../components/ui/Checkbox";
+import styles from "./styles";
+// import { useMutation } from "@tanstack/react-query";
+// import { register } from "../../api/services/auth.service";
+
+// Validation schema using Zod
+// const signupSchema = z
+//   .object({
+//     full_name: z.string().min(2, "Full name is required"),
+//     phone_number: z.string(),
+//     email: z.string().email("Invalid email address"),
+//     password: z.string().min(8, "Password must be at least 8 characters"),
+//     confirm_password: z.string(),
+//     role: z.string().optional(),
+//     terms_accepted: z.literal(true, {
+//       errorMap: () => ({ message: "You must accept the terms and conditions" }),
+//     }),
+//   })
+//   .refine((data) => data.password === data.confirm_password, {
+//     message: "Passwords do not match",
+//     path: ["confirm_password"],
+//   });
+
+// export type SignupFormData = z.infer<typeof signupSchema>;
+interface SignupFormData {
+  full_name: string;
+  phone_number: string;
+  email: string;
+  password: string;
+  confirm_password: string;
+  role: string;
+  terms_accepted: boolean;
+}
+
+export default function Signup() {
+  const navigation = useRouter();
+  const { role } = useLocalSearchParams<{ role?: string }>();
+  const [loading, setLoading] = useState(false);
+
+  // const signupMutation = useMutation({
+  //   mutationFn: (data: SignupFormData) => register(data),
+  //   onSuccess: (data) => {
+  //     const userEmail = data?.data?.user?.email;
+  //     if (userEmail) {
+  //       alert("Signup successful! Please verify your email now.");
+  //       navigation.navigate("Verification", { email: userEmail });
+  //     } else {
+  //       console.warn(
+  //         "Signup success, but email not found in response for navigation."
+  //       );
+  //       alert(
+  //         "Signup successful! Proceeding without email verification navigation."
+  //       );
+  //       navigation.navigate("Login");
+  //     }
+  //   },
+  //   onError: (error) => {
+  //     console.error("Signup Error:", error);
+  //     alert(`Signup failed: ${error.message || "Please try again."}`);
+  //   },
+  // });
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting, isValid },
+  } = useForm<SignupFormData>({
+    defaultValues: {
+      full_name: "",
+      phone_number: "",
+      email: "",
+      password: "",
+      confirm_password: "",
+      role: role || "patient",
+    },
+  });
+
+  const handleSignup = async () => {
+
+  };
+
+  return (
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="white" />
+      <SafeAreaView style={styles.container}>
+        <View style={styles.contentWrapper}>
+          <Image source={require("../../../assets/images/logo.png")} style={styles.logo} />
+
+          <Text style={styles.welcomeText}>
+            Join us on this amazing journey{"\n"} to seamless healthcare.
+          </Text>
+
+          <Text style={styles.headerTxt}>Sign up</Text>
+
+          <View style={styles.inputGroup}>
+            <View style={styles.inputContainer}>
+              <Controller
+                control={control}
+                name="full_name"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    placeholder="Full Name"
+                    style={styles.input}
+                    value={value}
+                    onChangeText={onChange}
+                    keyboardType="default"
+                  />
+                )}
+              />
+              {errors.full_name && (
+                <Text style={styles.error}>{errors.full_name.message}</Text>
+              )}
+            </View>
+            <View style={styles.inputContainer}>
+              <Controller
+                control={control}
+                name="phone_number"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    placeholder="phone_number"
+                    keyboardType="numeric"
+                    style={styles.input}
+                    value={value || ""}
+                    onChangeText={onChange}
+                  />
+                )}
+              />
+              {errors.phone_number && (
+                <Text style={styles.error}>{errors.phone_number.message}</Text>
+              )}
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Controller
+                control={control}
+                name="email"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    placeholder="Email"
+                    style={styles.input}
+                    value={value || ""}
+                    onChangeText={onChange}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                )}
+              />
+              {errors.email && (
+                <Text style={styles.error}>{errors.email.message}</Text>
+              )}
+            </View>
+            <View style={styles.inputContainer}>
+              <Controller
+                control={control}
+                name="password"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    placeholder="Create Password"
+                    style={styles.input}
+                    secureTextEntry
+                    value={value || ""}
+                    onChangeText={onChange}
+                  />
+                )}
+              />
+              {errors.password && (
+                <Text style={styles.error}>{errors.password.message}</Text>
+              )}
+            </View>
+            <View style={styles.inputContainer}>
+              <Controller
+                control={control}
+                name="confirm_password"
+                render={({ field: { onChange, value } }) => (
+                  <TextInput
+                    placeholder="Confirm Password"
+                    style={styles.input}
+                    secureTextEntry
+                    value={value}
+                    onChangeText={onChange}
+                  />
+                )}
+              />
+              {errors.confirm_password && (
+                <Text style={styles.error}>
+                  {errors.confirm_password.message}
+                </Text>
+              )}
+            </View>
+            <View style={styles.inputContainer}>
+              <Controller
+                control={control}
+                name="terms_accepted"
+                render={({ field: { onChange, value } }) => (
+                  <View>
+                    <Checkbox
+                      label="I agree to the Terms and Conditions"
+                      onValueChange={onChange}
+                      checked={value}
+                    />
+                    {errors.terms_accepted && (
+                      <Text style={styles.error}>
+                        {errors.terms_accepted.message}
+                      </Text>
+                    )}
+                  </View>
+                )}
+              />
+            </View>
+          </View>
+
+          <Pressable
+            style={styles.buttonContainer}
+            onPress={handleSubmit(handleSignup)}
+            disabled={!isValid || loading}
+          >
+            <Text style={styles.button}>
+              {loading ? "Signing up..." : "Sign up"}
+            </Text>
+          </Pressable>
+
+          <Text style={styles.lowerTxt}>
+            Do you have an account? You should{" "}
+            <Text
+              onPress={() => navigation.navigate("./login")}
+              style={styles.lowerLink}
+            >
+              Log in{" "}
+            </Text>
+            first.
+          </Text>
+        </View>
+      </SafeAreaView>
+    </>
+  );
+}

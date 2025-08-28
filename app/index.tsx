@@ -1,15 +1,61 @@
-import { Text, View } from "react-native";
+import React, { useEffect } from "react";
+import { StatusBar, StyleSheet } from "react-native";
+import SplashScreen from "./splashScreen";
+// import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import ToastManager from "toastify-react-native";
+import FontProvider from '../components/providers/FontProvider';
 
-export default function Index() {
+// import { onAuthStateChanged } from "firebase/auth";
+// import { useRouter } from "expo-router";
+import { useState } from "react";
+// import { auth } from "./firebaseConfig";
+// import Navigation from "./src/navigation";
+
+// const queryClient = new QueryClient();
+
+export default function App() {
+
+
+  // const navigation = useRouter();
+
+  // const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // useEffect(() => {
+  //   const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+  //     setUser(currentUser);
+  //     setLoading(false);
+  //   });
+
+  //   return () => unsubscribe();
+  // }, []);
+
+  useEffect(()=>{
+    // setLoading(false);
+
+  },[])
+
+  if (loading) {
+    console.log("Loading...");
+    return <SplashScreen />;
+  }
+
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
-    </View>
+    <SafeAreaProvider>
+        <FontProvider>
+          <StatusBar barStyle="dark-content" backgroundColor="white" />
+          <ToastManager />
+        </FontProvider>
+    </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
