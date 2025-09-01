@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, Pressable, Text, TextInput, View } from "react-native";
 // import { zodResolver } from "@hookform/resolvers/zod";
 // import { useMutation } from "@tanstack/react-query";
@@ -12,6 +12,10 @@ import { Controller, useForm } from "react-hook-form";
 // import { login } from "../../api/services/auth.service";
 import Checkbox from "../../../components/ui/Checkbox";
 // import useAuthStore from "../../store/auth";
+import { addAlert } from "@/integrations/features/alert/alertSlice";
+import { useLoginMutation } from "@/integrations/features/apis/apiSlice";
+import { loginUser } from "@/integrations/features/user/usersSlice";
+import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
 import styles from "./styles";
 
 // const loginSchema = z.object({
@@ -32,46 +36,7 @@ type FormData = {
 };
 
 export default function Login() {
-  const navigation = useRouter();
 
-  const [loading,setLoading] = useState(false)
-  // const authStore = useAuthStore();
-
-  // const loginMutation = useMutation({
-  //   mutationFn: (credentials: LoginFormData) =>
-  //     login({
-  //       email: credentials.email,
-  //       password: credentials.password,
-  //       remember_me: credentials.remember_me,
-  //     }),
-  //   onSuccess: (data) => {
-  //     const user = data.data.user;
-  //     const tokens = data.data.tokens;
-
-  //     authStore.login(user, tokens.accessToken, tokens.refreshToken);
-
-  //     Toast.success("Login successful!");
-  //   },
-  //   onError: (error) => {
-  //     console.error("Login failed:", error);
-  //     Toast.error("Login failed. Please check your credentials.");
-  //   },
-  // });
-
-  // const {
-  //   control,
-  //   handleSubmit,
-  //   formState: { errors },
-  // } = useForm<LoginFormData>({
-  //   resolver: zodResolver(loginSchema),
-  //   defaultValues: {
-  //     email: "",
-  //     password: "",
-  //     remember_me: false,
-  //   },
-  // });
-
-  
   const {
     control,
     handleSubmit,
@@ -84,8 +49,70 @@ export default function Login() {
     },
   });
 
-  const handleLogin = async () => {
+  const navigation = useRouter();
+
+  const [loading,setLoading] = useState(true)
+  
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(state => state.user);
+  const [login, { isLoading }] = useLoginMutation();
+  
+  useEffect(() => {
+    if (user.logedin && !loading  && !isLoading) {
+      if (user.verified_email ) {
+        navigation.replace("/home");
+      } else if (!user.verified_email){
+        navigation.replace("/OTPVerification");
+      } else if(user.gender == 'other') {
+        navigation.replace("/setupPatientProfile");
+      }
+    }
+  }, [loading,user]);
+
+
+  useEffect(() => {
+      if (user && loading) {
+        setLoading(false);
+      }
+    }, [user]);
+
+  const handleLogin = async (formdata: FormData) => {
+    if (!formdata.email && !formdata.password) {
+      // remember to dispatch alert
+      return;
+    }
+
+    const data = {
+      email: formdata.email,
+      password: formdata.password,
+    };
+
+
+    let res = await login(data);
+    if (res.data) {
+      dispatch(
+        loginUser({
+          ...res.data.user,
+          // usertoken: res.data.token,
+          logedin: true,
+          save: true,
+        })
+      ); 
+
+      if(res.data.user.gender == 'other') {
+        navigation.navigate("/setupPatientProfile");
+      }else{
+        navigation.navigate("/home");
+      }
+
+
+
+    } else if (res.error) {
+      dispatch(addAlert({ ...res.error, page: "login" }));
+    }
   };
+  
+  
 
   return (
     <View style={styles.container}>

@@ -1,17 +1,19 @@
-import { readFromAsyncStorage, writeToAsyncStorage } from '../../async_store';
 import { createSlice } from '@reduxjs/toolkit';
+import { readFromAsyncStorage, writeToAsyncStorage } from '../../async_store';
 
 const initialData = {
   id: 0, full_name: "", email: "",
-  user_type: "", phone_number: '',
-  specialization: '', verified_number: false, 
+  role: "", phone_number: '',
+  specialization: '', verified_phone_number: false, 
   verified_email: false, usertoken: "",
-  image: "", patient_count: 0, male_count: 0,
-  female_count:0 , gender: "",
+  profile_image: "", gender: "",
+
+  patient_count: 0, male_count: 0,
+  female_count:0 , 
   biography: "", date_of_birth: '',
   work_experience: 0, logedin: false,
-  api_number: ''
 }
+
 
 export const get_initial_user_data = async () => {
   let data = await readFromAsyncStorage("user")
@@ -49,6 +51,10 @@ export const userSlice = createSlice({
       
        writeToAsyncStorage("user", state)
     },
+    verify: (state, action) => {
+      state[action.payload] = true
+      writeToAsyncStorage("user", state)
+    },
     logoutUser: (state)=>{
       for (const key in state) {
         state[key] = initialData[key]
@@ -59,6 +65,6 @@ export const userSlice = createSlice({
  
 });
 
-export const { loginUser,logoutUser,addPatientCount } = userSlice.actions;
+export const { loginUser,logoutUser,addPatientCount,verify } = userSlice.actions;
 
 export default userSlice.reducer;

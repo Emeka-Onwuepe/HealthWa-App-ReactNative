@@ -6,7 +6,7 @@ import styles from "./style";
 
 export default function GetStarted() {
   const navigation = useRouter();
-  const navigateToSignup = (role: "doctor" | "patient") => {
+  const navigateToSignup = (role: "practitioner" | "patient") => {
     navigation.navigate({ pathname: "./signUp", params: { role } });
   };
 
@@ -32,7 +32,7 @@ export default function GetStarted() {
             <View style={styles.buttonGroup}>
               <Button
                 title="Give Medical Aid"
-                onPress={() => navigateToSignup("doctor")}
+                onPress={() => navigateToSignup("practitioner")}
               />
               <Button
                 title="Receive Medical Aid"

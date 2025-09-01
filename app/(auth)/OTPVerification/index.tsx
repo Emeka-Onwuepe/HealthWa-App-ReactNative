@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -11,17 +11,21 @@ import {
 // import { useMutation } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 // import { z } from "zod";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 
 // import {
 //   resendEmailVerification,
 //   verifyEmail,
 // } from "../../api/services/auth.service";
+import { addAlert } from "@/integrations/features/alert/alertSlice";
+import { useOTPMutation } from "@/integrations/features/apis/apiSlice";
+import { verify } from "@/integrations/features/user/usersSlice";
+import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
 import styles from "./styles";
 // import { getApiErrorMessage } from "../../utils/errors";
 
 // const verificationSchema = z.object({
-//   otp: z.string().length(4, "OTP must be 4 digits"),
+//   otp: z.string().length(6, "OTP must be 6 digits"),
 // });
 
 // type VerificationFormData = z.infer<typeof verificationSchema>;
@@ -31,10 +35,19 @@ type FormData = {
 };
 
 export default function Verification() {
-  const route = useRouter();
-  let { email } = useLocalSearchParams<{ email?: string }>();
-  const [verify_loading, setVerifyLoading] = useState(false);
-  const [resend_loading, setResendLoading] = useState(false);
+
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(state => state.user);
+  const [OTP, { isLoading }] = useOTPMutation();
+
+  const navigation = useRouter();
+  // let { email } = useLocalSearchParams<{ email?: string }>();
+
+  useEffect(() => {
+    if (user.verified_email) {
+      navigation.replace("/setupPatientProfile");
+    }
+  }, [user.verified_email]);
 
   const {
     control,
@@ -75,11 +88,42 @@ export default function Verification() {
   //   },
   // });
 
-  const onSubmit = () => {
-  
-  };
+  const handleOtp = async(action:string) => {
 
-  const handleResendOtp = () => {
+   let data_ = { usertoken: user.usertoken, otp: "", action};
+    if(action == 'verify_email'){
+    data_.otp = otp
+
+    }
+    let res = await OTP(data_);
+    console.log("OTP action success:", res);
+    console.log(action)
+
+    if (res.data) {
+      if (action === 'get_otp') {
+        console.log('get_otp')
+        dispatch(
+          addAlert({
+            status: 200,
+            message: res.data.message || "OTP Sent",
+          })
+        );
+      }else{
+        console.log('else')
+        dispatch(
+          addAlert({
+            status: 200,
+            message: res.data.message || "Email Verified",
+          })
+        );
+        dispatch(verify('verified_email'));
+        navigation.replace("/setupPatientProfile");
+      }
+      // setOtpSent(true);
+      // setResendTimer(90);
+    } else if (res.error) {
+      dispatch(addAlert({ ...res.error, page: "otp" }));
+    }
   
   };
 
@@ -95,7 +139,7 @@ export default function Verification() {
       <View style={styles.inputButton}>
         <View style={styles.inputContainer}>
           <View style={styles.dashContainer}>
-            {[...Array(4)].map((_, index) => (
+            {[...Array(6)].map((_, index) => (
               <View key={index} style={styles.dash}>
                 <Text style={styles.dashText}>{otp ? otp[index] : ""}</Text>
               </View>
@@ -107,10 +151,10 @@ export default function Verification() {
             render={({ field: { onChange, value } }) => (
               <TextInput
                 value={value}
-                onChangeText={(text) => onChange(text.slice(0, 4))}
+                onChangeText={(text) => onChange(text.slice(0, 6))}
                 placeholder="Enter OTP"
                 keyboardType="numeric"
-                maxLength={4}
+                maxLength={6}
                 style={styles.hiddenInput}
               />
             )}
@@ -123,13 +167,13 @@ export default function Verification() {
         <Pressable
           style={[
             styles.buttonContainer,
-            (!isValid || verify_loading) &&
+            (!isValid || isLoading) &&
               styles.disabledButton,
           ]}
-          onPress={handleSubmit(onSubmit)}
-          disabled={!isValid || verify_loading}
+          onPress={handleSubmit(()=>handleOtp('verify_email'))}
+          disabled={!isValid || isLoading}
         >
-          {verify_loading ? (
+          {isLoading ? (
             <ActivityIndicator color="#fff" />
           ) : (
             <Text style={styles.button}>Submit</Text>
@@ -141,9 +185,9 @@ export default function Verification() {
         <Text style={styles.resendPromptText}>Didn't recieve the OTP? </Text>
         <Text
           style={styles.resendLinkText}
-          onPress={!resend_loading ? handleResendOtp : undefined}
+          onPress={!isLoading ? ()=>handleOtp('get_otp') : undefined}
         >
-          {resend_loading ? "Sending..." : "resend?"}
+          {isLoading ? "Sending..." : "resend?"}
         </Text>
       </View>
     </SafeAreaView>

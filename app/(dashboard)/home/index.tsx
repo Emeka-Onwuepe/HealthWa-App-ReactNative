@@ -7,18 +7,19 @@ import {
   Text,
   View,
 } from "react-native";
+// import pharma from "../../../assets/images/pharma.png";
+// import useAuthStore from "../../../src/store/auth";
+import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
+import { useRouter } from "expo-router";
+import PageHeader from "../../../components/ui/PageHeader";
+import { getAvatarUrl } from "../../../utils/avatars";
 import styles from "./styles";
-import pharma from "../../../assets/images/pharma.png";
-import useAuthStore from "../../store/auth";
-import UpcomingAppointments from "../../components/UpcomingAppointments";
-import PageHeader from "../../components/ui/PageHeader";
-import { getAvatarUrl } from "../../utils/avatars";
-import AppLayout from "../../components/layouts/app.layout";
-import Activities from "../../components/Actvities";
-import { useAuth } from "../../hooks/useAuth";
 
-export default function Home({ navigation }) {
-  const { user } = useAuthStore();
+export default function Home() {
+  
+    const navigation = useRouter();
+    const dispatch = useAppDispatch();
+    const user = useAppSelector(state => state.user);
 
   const isDoctor = user.role === "doctor";
   const title = isDoctor ? "Dr. " : "";
@@ -44,12 +45,12 @@ export default function Home({ navigation }) {
       <PageHeader
         title={`${title + user.full_name}`}
         leftIcon="menu"
-        onLeftButtonPress={() => navigation.navigate("Settings")}
+        onLeftButtonPress={() => navigation.navigate("./Settings")}
         rightElement={<ProfileButton />}
       />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.topDisplay}>
-          <Image source={pharma} style={styles.backgroundImage} />
+          <Image source={require("../../../assets/images/pharma.png")} style={styles.backgroundImage} />
           <View style={styles.upperTxt}>
             <Text style={styles.taskTxt}>What would you like today?</Text>
             <Text style={styles.tagTxt}>
@@ -63,8 +64,8 @@ export default function Home({ navigation }) {
           </View>
         </View>
 
-        <UpcomingAppointments navigation={navigation} />
-        <Activities navigation={navigation} />
+        {/* <UpcomingAppointments navigation={navigation} /> */}
+        {/* <Activities navigation={navigation} /> */}
       </ScrollView>
     </SafeAreaView>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   Image,
@@ -14,6 +14,10 @@ import {
 
 import { useLocalSearchParams, useRouter } from "expo-router";
 
+import { addAlert } from "@/integrations/features/alert/alertSlice";
+import { useRegisterUserMutation } from "@/integrations/features/apis/apiSlice";
+import { loginUser } from "@/integrations/features/user/usersSlice";
+import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
 import Checkbox from "../../../components/ui/Checkbox";
 import styles from "./styles";
 // import { useMutation } from "@tanstack/react-query";
@@ -51,7 +55,21 @@ interface SignupFormData {
 export default function Signup() {
   const navigation = useRouter();
   const { role } = useLocalSearchParams<{ role?: string }>();
-  const [loading, setLoading] = useState(false);
+
+    const [registerUser, { isLoading:loading }] = useRegisterUserMutation();
+
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(state => state.user);
+
+  useEffect(() => {
+    if (user.logedin) {
+      if (user.verified_phone_number) {
+        navigation.navigate("/home");
+      } else {
+        navigation.navigate("/OTPVerification");
+      }
+    }
+  }, [user]);
 
   // const signupMutation = useMutation({
   //   mutationFn: (data: SignupFormData) => register(data),
@@ -88,11 +106,40 @@ export default function Signup() {
       password: "",
       confirm_password: "",
       role: role || "patient",
+      terms_accepted: false,
     },
   });
 
-  const handleSignup = async () => {
+  // const handleSignup = async () => {
 
+  // };
+
+  const handleSignup = async (formdata: SignupFormData) => {
+    if (formdata.terms_accepted) {
+      const data = {
+        email: formdata.email,
+        phone_number: formdata.phone_number,
+        password: formdata.password,
+        role: formdata.role,
+        full_name: formdata.full_name,
+      };
+
+      let res = await registerUser(data);
+      if (res.data) {
+        dispatch(
+          loginUser({
+            ...res.data.user,
+            // usertoken: res.data.token,
+            logedin: true,
+            save: true,
+          })
+        );
+        // dispatch(userRegistered());
+        navigation.navigate("../OTPVerification");
+      } else if (res.error) {
+        dispatch(addAlert({ ...res.error, page: "signup" }));
+      }
+    }
   };
 
   return (

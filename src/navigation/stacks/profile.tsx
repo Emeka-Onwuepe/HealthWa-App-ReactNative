@@ -1,8 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
+import SetupPatientProfile from "../../../app/setupPatientProfile";
 import Profile from "../../screens/Profile";
-import SetupProfile from "../../screens/SetupProfile";
-import SetupPatientProfile from "../../screens/SetupPatientProfile";
+import SetupProfile from "../../screens/setupProfile";
 
 const ProfileStack = createNativeStackNavigator();
 

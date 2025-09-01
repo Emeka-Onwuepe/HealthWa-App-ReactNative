@@ -1,12 +1,12 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
+import Home from "../../../app/(dashboard)/Home";
 import ChangePassword from "../../screens/ChangePassword";
 import DataProtection from "../../screens/DataProtection";
 import FAQ from "../../screens/FAQ";
-import Home from "../../screens/Home";
+import Notification from "../../screens/Notification";
 import PrivacyPolicy from "../../screens/PrivacyPolicy";
 import Settings from "../../screens/Settings";
-import Notification from "../../screens/Notification";
 
 const HomeStack = createNativeStackNavigator();
 

@@ -1,24 +1,21 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+// import { zodResolver } from "@hookform/resolvers/zod";
+// import { useMutation } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { SafeAreaView, ScrollView, Text, View } from "react-native";
 import { RadioGroup } from "react-native-radio-buttons-group";
-import { Toast } from "toastify-react-native";
-import { z } from "zod";
-import { setupPatientProfile } from "../../api/services/user.service";
+// import { z } from "zod";
+import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
+import { useRouter } from "expo-router";
 import Button from "../../components/ui/Button";
 import DateTimePicker from "../../components/ui/DateTImePicker";
 import PageHeader from "../../components/ui/PageHeader";
 import SelectInput from "../../components/ui/Select";
 import TextInput from "../../components/ui/TextInput";
 import { fontFamily } from "../../constants/typography";
-import useAuthStore from "../../store/auth";
 import { Gender } from "../../types";
-import { getDateByYearsAgo, isAdult } from "../../utils/date";
-import { getApiErrorMessage } from "../../utils/errors";
+import { getDateByYearsAgo } from "../../utils/date";
 import { convertEnumToPickerObject } from "../../utils/type";
 import styles from "./styles";
-import { CommonActions } from "@react-navigation/native";
 
 const genderItems = convertEnumToPickerObject(Gender);
 const ageRanges = [
@@ -57,32 +54,48 @@ const yesNoOptions = [
   },
 ];
 
-const SetupUserProfileFormSchema = z.object({
-  date_of_birth: z.coerce.date().refine((date) => isAdult(date), {
-    message: "You must be at least 18 years old",
-  }),
-  gender: z.string(),
-  age_range: z.string(),
-  occupation: z.string().min(1, "Occupation is required"),
-  weight: z.string().min(1, "Weight is required"),
-  height: z.string().min(1, "Height is required"),
-  is_diabetic: z.boolean().default(false),
-  is_asthmatic: z.boolean().default(false),
-  on_long_term_meds: z.boolean().default(false),
-  medications: z.string().optional(),
-});
+// const SetupUserProfileFormSchema = z.object({
+//   date_of_birth: z.coerce.date().refine((date) => isAdult(date), {
+//     message: "You must be at least 18 years old",
+//   }),
+//   gender: z.string(),
+//   age_range: z.string(),
+//   occupation: z.string().min(1, "Occupation is required"),
+//   weight: z.string().min(1, "Weight is required"),
+//   height: z.string().min(1, "Height is required"),
+//   is_diabetic: z.boolean().default(false),
+//   is_asthmatic: z.boolean().default(false),
+//   on_long_term_meds: z.boolean().default(false),
+//   medications: z.string().optional(),
+// });
 
-type SetupUserProfileFormData = z.infer<typeof SetupUserProfileFormSchema>;
+// type SetupUserProfileFormData = z.infer<typeof SetupUserProfileFormSchema>;
 
-export default function SetupPatientProfile({ navigation }) {
-  const { user, setUser } = useAuthStore();
+type FormData = {
+  date_of_birth?: Date | string;
+  gender: string;
+  age_range?: string;
+  occupation: string;
+  weight: string;
+  height: string;
+  is_diabetic: boolean;
+  is_asthmatic: boolean;
+  on_long_term_meds?: boolean;
+  medications?: string;
+};
+
+export default function SetupPatientProfile() {
+  // const { user, setUser } = useAuthStore();
+    const navigation = useRouter();
+    const dispatch = useAppDispatch();
+    const user = useAppSelector(state => state.user);
+    const isLoading = false;
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<SetupUserProfileFormData>({
-    resolver: zodResolver(SetupUserProfileFormSchema),
+  } = useForm<FormData>({
     defaultValues: {
       gender: "",
       occupation: "",
@@ -92,41 +105,40 @@ export default function SetupPatientProfile({ navigation }) {
       is_asthmatic: false,
     },
   });
-
   // setup mutation
-  const { mutate, isPending } = useMutation({
-    mutationFn: (data: SetupUserProfileFormData) => {
-      return setupPatientProfile({
-        ...data,
-        date_of_birth: new Date(data.date_of_birth),
-        weight: parseInt(data.weight),
-        height: parseInt(data.height),
-      });
-    },
-    onSuccess: (response) => {
-      setUser({ ...user, ...response.data.data });
-      Toast.success("Profile setup successful!");
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: "Profile" }],
-        })
-      );
-    },
-    onError: (error) => {
-      console.error("Error setting up profile:", error);
-      const errorMessage = getApiErrorMessage(
-        error,
-        "Failed to setup profile. Please try again."
-      );
-      Toast.error(errorMessage);
-    },
-  });
+  // const { mutate, isPending } = useMutation({
+  //   mutationFn: (data: SetupUserProfileFormData) => {
+  //     return setupPatientProfile({
+  //       ...data,
+  //       date_of_birth: new Date(data.date_of_birth),
+  //       weight: parseInt(data.weight),
+  //       height: parseInt(data.height),
+  //     });
+  //   },
+  //   onSuccess: (response) => {
+  //     setUser({ ...user, ...response.data.data });
+  //     Toast.success("Profile setup successful!");
+  //     navigation.dispatch(
+  //       CommonActions.reset({
+  //         index: 0,
+  //         routes: [{ name: "Profile" }],
+  //       })
+  //     );
+  //   },
+  //   onError: (error) => {
+  //     console.error("Error setting up profile:", error);
+  //     const errorMessage = getApiErrorMessage(
+  //       error,
+  //       "Failed to setup profile. Please try again."
+  //     );
+  //     Toast.error(errorMessage);
+  //   },
+  // });
 
-  const onSubmit = async (values: SetupUserProfileFormData) => {
-    console.log("Form values:", values);
-    mutate(values);
+  const onSubmit = async () => {
+    
   };
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -163,7 +175,7 @@ export default function SetupPatientProfile({ navigation }) {
             render={({ field: { onChange, value } }) => (
               <DateTimePicker
                 label="Date of Birth"
-                value={value}
+                value={typeof value === "string" || typeof value === "undefined" ? null : value}
                 onChange={onChange}
                 mode="date"
                 maximumDate={getDateByYearsAgo(18)}
@@ -207,7 +219,7 @@ export default function SetupPatientProfile({ navigation }) {
               <TextInput
                 label="Height"
                 placeholder="Enter your height in cm"
-                value={value}
+                value={value ?? ""}
                 onChangeText={onChange}
                 keyboardType="numeric"
                 error={errors.height?.message}
@@ -223,7 +235,7 @@ export default function SetupPatientProfile({ navigation }) {
               <TextInput
                 label="Weight"
                 placeholder="Enter your weight in kg"
-                value={value}
+                value={value ?? ""}
                 onChangeText={onChange}
                 keyboardType="numeric"
                 error={errors.height?.message}
@@ -239,7 +251,7 @@ export default function SetupPatientProfile({ navigation }) {
               <TextInput
                 label="Occupation"
                 placeholder="Occupation"
-                value={value}
+                value={value ?? ""}
                 onChangeText={onChange}
                 error={errors.height?.message}
                 labelStyle={styles.inputLabel}
@@ -256,9 +268,9 @@ export default function SetupPatientProfile({ navigation }) {
                 <RadioGroup
                   radioButtons={yesNoOptions}
                   selectedId={value === true ? "true" : "false"}
-                  onPress={(selectedId) => {
-                    onChange(selectedId == "true");
-                  }}
+                  // onPress={(selectedId) => {
+                  //   onChange(selectedId == "true");
+                  // }}
                   containerStyle={styles.radioGroup}
                 />
               </View>
@@ -274,9 +286,9 @@ export default function SetupPatientProfile({ navigation }) {
                 <RadioGroup
                   radioButtons={yesNoOptions}
                   selectedId={value === true ? "true" : "false"}
-                  onPress={(selectedId) => {
-                    onChange(selectedId == "true");
-                  }}
+                  // onPress={(selectedId) => {
+                  //   onChange(selectedId == "true");
+                  // }}
                   containerStyle={styles.radioGroup}
                 />
               </View>
@@ -294,9 +306,9 @@ export default function SetupPatientProfile({ navigation }) {
                 <RadioGroup
                   radioButtons={yesNoOptions}
                   selectedId={value === true ? "true" : "false"}
-                  onPress={(selectedId) => {
-                    onChange(selectedId == "true");
-                  }}
+                  // onPress={(selectedId) => {
+                  //   onChange(selectedId == "true");
+                  // }}
                   containerStyle={styles.radioGroup}
                 />
               </View>
@@ -309,14 +321,14 @@ export default function SetupPatientProfile({ navigation }) {
             render={({ field: { onChange, value } }) => (
               <TextInput
                 placeholder="If yes, kindly list..."
-                value={value}
+                value={value ?? ""}
                 onChangeText={onChange}
                 error={errors.height?.message}
                 labelStyle={styles.inputLabel}
               />
             )}
           />
-          <Button onPress={handleSubmit(onSubmit)} loading={isPending}>
+          <Button onPress={handleSubmit(onSubmit)} loading={isLoading}>
             <Text style={styles.submitButtonText}>SUBMIT</Text>
           </Button>
         </View>

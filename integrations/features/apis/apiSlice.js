@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 // Define a service using a base URL and expected endpoints
-export const baseUrl = 'https://dev.persuasivemhealth.com'
+export const baseUrl = 'http://localhost:5000/api'
 // export const baseUrl = 'https://67b9-102-89-33-90.ngrok-free.app'
 
 export const mediAppApi = createApi({
@@ -20,7 +20,7 @@ export const mediAppApi = createApi({
 
         login: builder.mutation({
             query: data => ({
-                url: "/login",
+                url: "user/login",
                 method: "POST",
                 body: data
             }),
@@ -29,9 +29,9 @@ export const mediAppApi = createApi({
             invalidatesTags: ['userlogin']
         }),
 
-        registerMPUser: builder.mutation({
+        registerUser: builder.mutation({
             query: data => ({
-                url: "/registermp",
+                url: "/user/signup",
                 method: "POST",
                 body: data
             }),
@@ -42,8 +42,8 @@ export const mediAppApi = createApi({
 
         changePassword: builder.mutation({
             query: data => ({
-                url: "/changepassword",
-                headers: { "Authorization": `Token ${data.token}`},
+                url: "/user/changepassword",
+                // headers: { "Authorization": `Token ${data.token}`},
                 method: "POST",
                 body: data
             }),
@@ -51,7 +51,7 @@ export const mediAppApi = createApi({
         
         forgotPassword: builder.mutation({
             query: data => ({
-                url: "/forgotpassword",
+                url: "/user/forgotpassword",
                 method: "POST",
                 body: data
             }),
@@ -59,8 +59,8 @@ export const mediAppApi = createApi({
 
         logout: builder.mutation({
             query: token => ({
-                url: `/logout`,
-                headers: { "Authorization": `Token ${token}` },
+                url: `/user/logout`,
+                // headers: { "Authorization": `Token ${token}` },
                 method: "POST",
             }),
         }),
@@ -68,8 +68,8 @@ export const mediAppApi = createApi({
     
         OTP: builder.mutation({
             query: data => ({
-                url: `/otp`,
-                headers: { "Authorization": `Token ${data.token}` },
+                url: `/user/otp`,
+                // headers: { "Authorization": `Token ${data.token}` },
                 method: "POST",
                 body: data,
             }),
@@ -78,15 +78,6 @@ export const mediAppApi = createApi({
         patient: builder.mutation({
             query: data => ({
                 url: `/patient`,
-                headers: { "Authorization": `Token ${data.token}` },
-                method: "POST",
-                body: data.data,
-            }),
-        }),
-
-        whatsappRecords: builder.mutation({
-            query: data => ({
-                url: `/whatsapp_records`,
                 headers: { "Authorization": `Token ${data.token}` },
                 method: "POST",
                 body: data.data,
@@ -125,10 +116,10 @@ export const mediAppApi = createApi({
 })
 
 export const {
-    useLoginMutation, useRegisterMPUserMutation,
+    useLoginMutation, useRegisterUserMutation,
     useLogoutMutation, useOTPMutation,
     useAppointmentsMutation,
-    usePatientMutation, useWhatsappRecordsMutation,
+    usePatientMutation, 
     useChangePasswordMutation,
     useForgotPasswordMutation
 } = mediAppApi
