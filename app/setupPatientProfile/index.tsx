@@ -1,19 +1,22 @@
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import { useMutation } from "@tanstack/react-query";
-import { Controller, useForm } from "react-hook-form";
-import { SafeAreaView, ScrollView, Text, View } from "react-native";
-import { RadioGroup } from "react-native-radio-buttons-group";
-// import { z } from "zod";
 import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
 import { useRouter } from "expo-router";
+import { Controller, useForm } from "react-hook-form";
+import { SafeAreaView, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { RadioGroup } from "react-native-radio-buttons-group";
 import Button from "../../components/ui/Button";
-import DateTimePicker from "../../components/ui/DateTImePicker";
+// import DateTimePicker from "../../components/ui/DateTImePicker";
+import DateTimePicker from '@react-native-community/datetimepicker';
+
+import { addAlert } from "@/integrations/features/alert/alertSlice";
+import { usePatientMutation } from "@/integrations/features/apis/apiSlice";
+import { addSinglePatient } from "@/integrations/features/patient/patientsSlice";
+import { loginUser } from "@/integrations/features/user/usersSlice";
+import { Ionicons } from "@expo/vector-icons";
+import { useEffect, useState } from "react";
 import PageHeader from "../../components/ui/PageHeader";
 import SelectInput from "../../components/ui/Select";
 import TextInput from "../../components/ui/TextInput";
-import { fontFamily } from "../../constants/typography";
 import { Gender } from "../../types";
-import { getDateByYearsAgo } from "../../utils/date";
 import { convertEnumToPickerObject } from "../../utils/type";
 import styles from "./styles";
 
@@ -54,22 +57,6 @@ const yesNoOptions = [
   },
 ];
 
-// const SetupUserProfileFormSchema = z.object({
-//   date_of_birth: z.coerce.date().refine((date) => isAdult(date), {
-//     message: "You must be at least 18 years old",
-//   }),
-//   gender: z.string(),
-//   age_range: z.string(),
-//   occupation: z.string().min(1, "Occupation is required"),
-//   weight: z.string().min(1, "Weight is required"),
-//   height: z.string().min(1, "Height is required"),
-//   is_diabetic: z.boolean().default(false),
-//   is_asthmatic: z.boolean().default(false),
-//   on_long_term_meds: z.boolean().default(false),
-//   medications: z.string().optional(),
-// });
-
-// type SetupUserProfileFormData = z.infer<typeof SetupUserProfileFormSchema>;
 
 type FormData = {
   date_of_birth?: Date | string;
@@ -80,7 +67,7 @@ type FormData = {
   height: string;
   is_diabetic: boolean;
   is_asthmatic: boolean;
-  on_long_term_meds?: boolean;
+  on_long_term_meds: boolean;
   medications?: string;
 };
 
@@ -89,11 +76,16 @@ export default function SetupPatientProfile() {
     const navigation = useRouter();
     const dispatch = useAppDispatch();
     const user = useAppSelector(state => state.user);
-    const isLoading = false;
+    const [calendarVisible, setCalendarVisible] = useState(false);
+    const [patient, { isLoading }] = usePatientMutation();
+    const [loading,setLoading] = useState(true)
+    
 
   const {
     control,
     handleSubmit,
+    setValue,
+    getValues,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
@@ -103,46 +95,75 @@ export default function SetupPatientProfile() {
       height: "",
       is_diabetic: false,
       is_asthmatic: false,
+      medications: "",
+      on_long_term_meds: false,
+      date_of_birth: new Date().toISOString().split("T")[0],
+
     },
   });
-  // setup mutation
-  // const { mutate, isPending } = useMutation({
-  //   mutationFn: (data: SetupUserProfileFormData) => {
-  //     return setupPatientProfile({
-  //       ...data,
-  //       date_of_birth: new Date(data.date_of_birth),
-  //       weight: parseInt(data.weight),
-  //       height: parseInt(data.height),
-  //     });
-  //   },
-  //   onSuccess: (response) => {
-  //     setUser({ ...user, ...response.data.data });
-  //     Toast.success("Profile setup successful!");
-  //     navigation.dispatch(
-  //       CommonActions.reset({
-  //         index: 0,
-  //         routes: [{ name: "Profile" }],
-  //       })
-  //     );
-  //   },
-  //   onError: (error) => {
-  //     console.error("Error setting up profile:", error);
-  //     const errorMessage = getApiErrorMessage(
-  //       error,
-  //       "Failed to setup profile. Please try again."
-  //     );
-  //     Toast.error(errorMessage);
-  //   },
-  // });
 
-  const onSubmit = async () => {
-    
-  };
+    useEffect(() => {
+      if (user.logedin && !loading  && !isLoading) {
+        if (user.verified_email  && user.gender != 'other') {
+          navigation.replace("/home");
+        } else if (!user.verified_email){
+          navigation.replace("/OTPVerification");
+        }
+      }
+    }, [loading,user]);
+  
+  
+    useEffect(() => {
+        if (user && loading) {
+          setLoading(false);
+        }
+      }, [user]);
+
+ 
+  const onSubmit = async (data:FormData) => {
+    const data_ = {
+      action: "create",
+      usertoken:user.usertoken,
+      data: {
+      ...data,
+      user_id: user.id,
+       }
+        }
+         console.log(data_)
+        let res = await patient(data_);
+       
+         if (res.data) {
+              dispatch(
+                loginUser({
+                  ...res.data.user,
+                  logedin: true,
+                  save: true,
+                })
+              ); 
+
+              dispatch(
+                addSinglePatient(res.data.patient)
+              ); 
+              
+        
+              if(res.data.user.gender != 'other') {
+                navigation.replace("/home");
+              }
+        
+        
+        
+            } else if (res.error) {
+              dispatch(addAlert({ ...res.error, page: "patientSetupPage" }));
+            }
+
+
+
+      };
 
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={[styles.container, { flex: 1 }]}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
         <PageHeader title="Patient Profile Setup" />
 
         <View style={styles.headerContainer}>
@@ -168,8 +189,51 @@ export default function SetupPatientProfile() {
           </View>
         </View>
 
+        <View style={{ marginTop: 10, marginBottom: 20 }}>
+          <Text style={styles.label}>Date of Birth</Text>
+          <TouchableOpacity onPress={() => setCalendarVisible(true)} 
+          style={{ borderColor: "#11B3CF", borderWidth: 1, borderRadius: 50, 
+                  marginTop: 10}}>
+            <View style={[{ flexDirection: "row", alignItems: "center", padding: 10, marginLeft: 10 }]}>
+              <Ionicons
+              name="calendar-outline"
+              size={20}
+              style={{ marginRight: 8 }}
+              />
+              <Controller
+              control={control}
+              name="date_of_birth"
+              render={({ field: { value } }) => (
+                <Text>
+                {value ? (typeof value === "string" ? value : value.toISOString().split("T")[0]) : ""}
+                </Text>
+              )}
+              />
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* Date Picker Modal */}
+          {calendarVisible && (
+             <View>
+          <DateTimePicker
+            value={new Date(getValues("date_of_birth") ?? new Date().toISOString().split("T")[0])}
+            mode="date"
+            display="default"
+            onChange={(event, date) => {
+              setCalendarVisible(false);
+              if (date) {
+                setValue("date_of_birth", date.toISOString().split("T")[0]); // Format date to YYYY-MM-DD 
+              }
+            }}
+          />
+        </View>
+          )}
+
+
+
         <View>
-          <Controller
+          {/* <Controller
             control={control}
             name="date_of_birth"
             render={({ field: { onChange, value } }) => (
@@ -184,7 +248,15 @@ export default function SetupPatientProfile() {
                 containerStyle={{ fontFamily: fontFamily.regular }}
               />
             )}
-          />
+          /> */}
+
+              {/* <Controller
+                control={control}
+                name="date_of_birth"
+                render={({ field: { value } }) => (
+                  <Text>{value ? (typeof value === "string" ? value : value.toISOString().split("T")[0]) : ""}</Text>
+                )}
+              /> */}
 
           <Controller
             control={control}
@@ -268,9 +340,9 @@ export default function SetupPatientProfile() {
                 <RadioGroup
                   radioButtons={yesNoOptions}
                   selectedId={value === true ? "true" : "false"}
-                  // onPress={(selectedId) => {
-                  //   onChange(selectedId == "true");
-                  // }}
+                  onPress={(selectedId) => {
+                    onChange(selectedId == "true");
+                  }}
                   containerStyle={styles.radioGroup}
                 />
               </View>
@@ -286,9 +358,9 @@ export default function SetupPatientProfile() {
                 <RadioGroup
                   radioButtons={yesNoOptions}
                   selectedId={value === true ? "true" : "false"}
-                  // onPress={(selectedId) => {
-                  //   onChange(selectedId == "true");
-                  // }}
+                  onPress={(selectedId) => {
+                    onChange(selectedId == "true");
+                  }}
                   containerStyle={styles.radioGroup}
                 />
               </View>
@@ -306,9 +378,9 @@ export default function SetupPatientProfile() {
                 <RadioGroup
                   radioButtons={yesNoOptions}
                   selectedId={value === true ? "true" : "false"}
-                  // onPress={(selectedId) => {
-                  //   onChange(selectedId == "true");
-                  // }}
+                  onPress={(selectedId) => {
+                    onChange(selectedId == "true");
+                  }}
                   containerStyle={styles.radioGroup}
                 />
               </View>

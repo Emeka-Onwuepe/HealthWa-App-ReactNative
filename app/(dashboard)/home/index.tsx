@@ -9,6 +9,8 @@ import {
 } from "react-native";
 // import pharma from "../../../assets/images/pharma.png";
 // import useAuthStore from "../../../src/store/auth";
+import Activities from "@/components/Actvities";
+import UpcomingAppointments from "@/components/UpcomingAppointments";
 import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
 import { useRouter } from "expo-router";
 import PageHeader from "../../../components/ui/PageHeader";
@@ -21,7 +23,7 @@ export default function Home() {
     const dispatch = useAppDispatch();
     const user = useAppSelector(state => state.user);
 
-  const isDoctor = user.role === "doctor";
+  const isDoctor = user.role === "practitioner";
   const title = isDoctor ? "Dr. " : "";
 
   const avatarUrl = getAvatarUrl(user.full_name);
@@ -41,14 +43,15 @@ export default function Home() {
   };
 
   return (
+    <ScrollView>
     <SafeAreaView style={styles.container}>
       <PageHeader
         title={`${title + user.full_name}`}
         leftIcon="menu"
-        onLeftButtonPress={() => navigation.navigate("./Settings")}
+        onLeftButtonPress={() => navigation.navigate("/settings")}
         rightElement={<ProfileButton />}
       />
-      <ScrollView showsVerticalScrollIndicator={false}>
+      {/* <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}> */}
         <View style={styles.topDisplay}>
           <Image source={require("../../../assets/images/pharma.png")} style={styles.backgroundImage} />
           <View style={styles.upperTxt}>
@@ -64,9 +67,10 @@ export default function Home() {
           </View>
         </View>
 
-        {/* <UpcomingAppointments navigation={navigation} /> */}
-        {/* <Activities navigation={navigation} /> */}
-      </ScrollView>
+         <UpcomingAppointments/> 
+         <Activities/>
+      {/* </ScrollView> */}
     </SafeAreaView>
+    </ScrollView>
   );
 }

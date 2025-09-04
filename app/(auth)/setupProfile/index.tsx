@@ -1,6 +1,4 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import { useMutation } from "@tanstack/react-query";
 import * as DocumentPicker from "expo-document-picker";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";

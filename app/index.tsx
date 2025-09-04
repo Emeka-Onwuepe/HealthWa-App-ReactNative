@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
 import { StatusBar, StyleSheet } from "react-native";
-import SplashScreen from "./splashScreen";
-// import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import ToastManager from "toastify-react-native";
 import FontProvider from '../components/providers/FontProvider';
+import SplashScreen from "./splashScreen";
 
 // import { onAuthStateChanged } from "firebase/auth";
 // import { useRouter } from "expo-router";

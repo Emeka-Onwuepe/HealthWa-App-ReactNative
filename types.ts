@@ -1,5 +1,5 @@
 export interface User {
-  _id: string;
+  id: string;
   full_name: string;
   email: string;
   role: string;
@@ -37,18 +37,68 @@ export enum APPOINTMENT_TYPE {
 }
 
 export interface Appointment {
-  _id: string;
+  id: string;
   type: APPOINTMENT_TYPE;
   symptons: string[];
   preferred_professional?: string;
   preferred_gender?: string;
   doctor: User;
   patient: User;
+  patient_id: string;
   schedule: Date;
   status: APPOINTMENT_STATUS;
   created_at: Date;
   updated_at: Date;
 }
+
+export const sampleAppointments = [
+  {
+    id: "1",
+    type: APPOINTMENT_TYPE.INITIAL_CONSULTATION,
+    symptons: ["fever", "cough"],
+    doctor: {
+      id: "d1",
+      full_name: "Dr. John Doe",
+      email: "john.doe@hospital.com",
+      role: "doctor",
+    },
+    patient: {
+      id: "p1",
+      full_name: "Jane Smith",
+      email: "jane.smith@email.com",
+      role: "patient",
+    },
+    patient_id: "p1",
+    schedule: new Date("2024-07-01T10:00:00Z"),
+    status: APPOINTMENT_STATUS.UPCOMING,
+    created_at: new Date("2024-06-20T09:00:00Z"),
+    updated_at: new Date("2024-06-20T09:00:00Z"),
+  },
+  {
+    id: "2",
+    type: APPOINTMENT_TYPE.FOLLOW_UP,
+    symptons: ["headache"],
+    doctor: {
+      id: "d2",
+      full_name: "Dr. Alice Brown",
+      email: "alice.brown@hospital.com",
+      role: "doctor",
+    },
+    patient: {
+      id: "p2",
+      full_name: "Bob Johnson",
+      email: "bob.johnson@email.com",
+      role: "patient",
+    },
+    patient_id: "p2",
+    schedule: new Date("2024-07-02T14:30:00Z"),
+    status: APPOINTMENT_STATUS.COMPLETED,
+    created_at: new Date("2024-06-21T11:00:00Z"),
+    updated_at: new Date("2024-07-02T15:00:00Z"),
+  },
+];
+
+
 
 export interface AppointmentQuery {
   page?: string;

@@ -9,8 +9,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-// import { z } from "zod";
-// import { zodResolver } from "@hookform/resolvers/zod";
+
 
 import { useLocalSearchParams, useRouter } from "expo-router";
 
@@ -20,28 +19,7 @@ import { loginUser } from "@/integrations/features/user/usersSlice";
 import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
 import Checkbox from "../../../components/ui/Checkbox";
 import styles from "./styles";
-// import { useMutation } from "@tanstack/react-query";
-// import { register } from "../../api/services/auth.service";
 
-// Validation schema using Zod
-// const signupSchema = z
-//   .object({
-//     full_name: z.string().min(2, "Full name is required"),
-//     phone_number: z.string(),
-//     email: z.string().email("Invalid email address"),
-//     password: z.string().min(8, "Password must be at least 8 characters"),
-//     confirm_password: z.string(),
-//     role: z.string().optional(),
-//     terms_accepted: z.literal(true, {
-//       errorMap: () => ({ message: "You must accept the terms and conditions" }),
-//     }),
-//   })
-//   .refine((data) => data.password === data.confirm_password, {
-//     message: "Passwords do not match",
-//     path: ["confirm_password"],
-//   });
-
-// export type SignupFormData = z.infer<typeof signupSchema>;
 interface SignupFormData {
   full_name: string;
   phone_number: string;

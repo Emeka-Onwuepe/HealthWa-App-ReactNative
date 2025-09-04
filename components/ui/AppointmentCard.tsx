@@ -1,25 +1,14 @@
-import { View, Text, StyleSheet, Image, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { getAvatarUrl } from "../../utils/avatars";
-import { Appointment } from "../../types";
-import { getTwelveHourFormat } from "../../utils/date";
 import { useState } from "react";
-import dayjs from "dayjs";
-import { ReminderService } from "../../api/reminder.service";
-import { Toast } from "toastify-react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Appointment } from "../../types";
+import { getAvatarUrl } from "../../utils/avatars";
+import { getTwelveHourFormat } from "../../utils/date";
+// import dayjs from "dayjs";
+// import { ReminderService } from "../../api/reminder.service";
 
 
-interface AppointmentCardProps {
-  appointment: Appointment;
-  isDoctor?: boolean;
-  navigation?: any;
-}
-
-export default function AppointmentCard({
-  appointment,
-  isDoctor = false,
-  navigation,
-}: AppointmentCardProps) {
+export default function AppointmentCard({appointment}: {appointment: Appointment}) {
   const patientName = appointment.patient?.full_name || "N/A";
   const consultationType = appointment.type || "Consultation";
   const consultationTime = appointment.schedule
@@ -41,21 +30,21 @@ export default function AppointmentCard({
     setLoading(true);
     setError(null);
 
-    try {
-      const payload = {
-        appointment: appointmentId,
-        time: dayjs(appointment.schedule).subtract(30, "minute").toDate(),
-      };
+    // try {
+    //   const payload = {
+    //     appointment: appointmentId,
+    //     time: dayjs(appointment.schedule).subtract(30, "minute").toDate(),
+    //   };
 
-      console.log(payload);
+    //   console.log(payload);
 
-      const res = await ReminderService.createReminder(payload);
-      Toast.success("Reminder set for 30mins before appointment");
-      console.log(res);
-      console.log("Apointment ID", appointmentId);
-    } catch (error) {
-      console.log("Error creating reminder", error);
-    }
+    //   const res = await ReminderService.createReminder(payload);
+    //   Toast.success("Reminder set for 30mins before appointment");
+    //   console.log(res);
+    //   console.log("Apointment ID", appointmentId);
+    // } catch (error) {
+    //   console.log("Error creating reminder", error);
+    // }
   };
 
   return (
@@ -109,7 +98,7 @@ export default function AppointmentCard({
         {status.toLowerCase() === "upcoming" && (
           <Pressable
             style={styles.reminderButton}
-            onPress={() => handleCreateReminder(appointment._id)}
+            onPress={() => handleCreateReminder(appointment.id)}
           >
             <Text style={styles.reminderText}>Set Reminder</Text>
           </Pressable>
@@ -118,7 +107,7 @@ export default function AppointmentCard({
         {status.toLowerCase() === "ongoing" && (
           <Pressable
             style={styles.callButton}
-            onPress={() => navigation.navigate("Call")}
+            // onPress={() => navigation.navigate("Call")}
           >
             <Ionicons name="videocam" size={20} color="#0B8AA0" />
             <Text style={styles.callText}>Join Call</Text>

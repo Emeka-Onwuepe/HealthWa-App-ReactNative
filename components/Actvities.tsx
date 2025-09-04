@@ -1,12 +1,14 @@
-import { Pressable, StyleSheet, View, Text } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import ActivityCard from "./ui/ActivitiesCard";
 
-export default function Activities({ navigation }) {
+export default function Activities() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Activities</Text>
-        <Pressable onPress={() => navigation.navigate("Activities")}>
+        <Pressable 
+        // onPress={() => navigation.navigate("Activities")}
+          >
           <Text style={styles.headerLink}>View All</Text>
         </Pressable>
       </View>

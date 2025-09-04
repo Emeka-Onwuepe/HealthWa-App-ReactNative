@@ -3,26 +3,40 @@ import { readFromAsyncStorage, writeToAsyncStorage } from '../../async_store';
 
      
 // medical_practitioner
+// const initialData = {
+//   data: [{
+//       id: 0,
+//       full_name: '',
+//       whatsapp_number: '',
+//       identifier:'',
+//       image:  undefined,
+//       document: undefined,
+//       date: '',
+//       date_of_birth: '',
+//       address: '',
+//       medical_practitioner: 0,
+//       about: '',
+//       genotype: '',
+//       next_of_kin: '',
+//       kin_number:'',
+//       gender: '',
+//       condition: '',
+//       symptoms: '',
+//   }]}
+
 const initialData = {
   data: [{
       id: 0,
-      full_name: '',
-      whatsapp_number: '',
-      identifier:'',
-      image:  undefined,
-      document: undefined,
-      date: '',
-      date_of_birth: '',
-      address: '',
-      medical_practitioner: 0,
-      about: '',
-      genotype: '',
-      next_of_kin: '',
-      kin_number:'',
-      gender: '',
-      condition: '',
-      symptoms: '',
+      occupation: "",
+      weight: "",
+      height: "",
+      is_diabetic: false,
+      is_asthmatic: false,
+      medications: "",
+      on_long_term_meds: false,
   }]}
+
+ 
 
 
 export const get_initial_patients_data = async () => {
@@ -52,9 +66,10 @@ export const patientsSlice = createSlice({
     },
 
     addSinglePatient: (state, action) => {
-          let filtered = state.data.filter(data => data.id != action.payload.id)
-          filtered = [...filtered, action.payload]
-            state.data = filtered
+          // let filtered = state.data.filter(data => data.id != action.payload.id)
+          // filtered = [...filtered, action.payload]
+          //   state.data = filtered
+          state.data = [action.payload]
             writeToAsyncStorage("patients", {data:state.data})
         },
 

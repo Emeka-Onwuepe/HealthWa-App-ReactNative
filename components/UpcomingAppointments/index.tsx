@@ -1,28 +1,33 @@
 import {
-  View,
-  Text,
+  ActivityIndicator,
   Pressable,
   StyleSheet,
-  ActivityIndicator,
+  Text,
+  View,
 } from "react-native";
-import { useQuery } from "@tanstack/react-query";
 
+import { sampleAppointments } from "@/types";
 import AppointmentCard from "../ui/AppointmentCard";
-import { Appointment } from "../../types";
-import { fetchUpcomingAppointments } from "../../api/services/appointment.service";
 
-export default function UpcomingAppointments({ navigation }) {
-  const {
-    data: appointmentsData,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["upcomingAppointments"],
-    queryFn: fetchUpcomingAppointments,
-  });
+export default function UpcomingAppointments() {
 
-  const appointments: Appointment[] = appointmentsData?.data?.data ?? [];
+  const isLoading = false
+  const isError = false
+  const error: { message?: string } | null = null
+  const appointments = sampleAppointments
+    
+
+  // const {
+  //   data: appointmentsData,
+  //   isLoading,
+  //   isError,
+  //   error,
+  // } = useQuery({
+  //   queryKey: ["upcomingAppointments"],
+  //   queryFn: fetchUpcomingAppointments,
+  // });
+
+  // const appointments: Appointment[] = appointmentsData?.data?.data ?? [];
 
   const renderContent = () => {
     if (isLoading) {
@@ -38,7 +43,7 @@ export default function UpcomingAppointments({ navigation }) {
       return (
         <View style={styles.centered}>
           <Text style={styles.errorText}>
-            Error loading appointments: {error?.message || "Unknown error"}
+            Error loading appointments: {(error as { message?: string } | null)?.message || "Unknown error"}
           </Text>
         </View>
       );
@@ -52,13 +57,15 @@ export default function UpcomingAppointments({ navigation }) {
       );
     }
 
-    return appointments.map((appointment) => (
-      <AppointmentCard
-        key={appointment._id || Math.random().toString()}
-        appointment={appointment}
-        navigation={navigation}
-      />
-    ));
+    return appointments.map((appointment) => {
+      return (
+        <AppointmentCard
+          key={appointment.id || Math.random().toString()}
+          appointment={appointment}
+          // navigation={navigation}
+        />
+      );
+    });
   };
 
   return (
@@ -66,9 +73,9 @@ export default function UpcomingAppointments({ navigation }) {
       <View style={styles.header}>
         <Text style={styles.headerText}>Upcoming appointments</Text>
         <Pressable
-          onPress={() =>
-            navigation.navigate("Appointment", { screen: "Appointment" })
-          }
+          // onPress={() =>
+          //   navigation.navigate("Appointment", { screen: "Appointment" })
+          // }
         >
           <Text style={styles.headerLink}>View All</Text>
         </Pressable>

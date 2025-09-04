@@ -1,13 +1,13 @@
-import React from "react";
-import { View, Text, Image, Pressable, ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import PageHeader from "../../components/ui/PageHeader";
-import useAuthStore from "../../store/auth";
-import { getAvatarUrl } from "../../utils/avatars";
-import { toTitleCase } from "../../utils/strings";
+import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CommonActions } from "@react-navigation/native";
+import { useRouter } from "expo-router";
+import React from "react";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import PageHeader from "../../../components/ui/PageHeader";
+import { getAvatarUrl } from "../../../utils/avatars";
+import { toTitleCase } from "../../../utils/strings";
 import styles from "./styles";
 
 const pages = [
@@ -43,11 +43,14 @@ const pages = [
   },
 ];
 
-export default function Settings({ navigation }) {
-  const { user, logout } = useAuthStore();
+export default function Settings() {
+  // const { user, logout } = useAuthStore();
+  const navigation = useRouter()
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(state => state.user);
 
   const avatarUrl = getAvatarUrl(user.full_name);
-  const isDoctor = user.role === "doctor";
+  const isDoctor = user.role === "practitioner";
 
   const imageSource = user.profile_image
     ? { uri: user.profile_image }
@@ -56,30 +59,30 @@ export default function Settings({ navigation }) {
   const title = isDoctor ? "Dr. " : "";
 
   const handleProfilePress = () => {
-    navigation.navigate("Profile");
+    // navigation.navigate("Profile");
   };
 
-  const handleNavigate = (route: string) => {
-    try {
-      navigation.navigate(route);
-    } catch (error) {
-      console.warn(`Navigation Error: Could not find screen "${route}".`);
-    }
-  };
+  // const handleNavigate = (route: string) => {
+  //   try {
+  //     navigation.navigate(route);
+  //   } catch (error) {
+  //     console.warn(`Navigation Error: Could not find screen "${route}".`);
+  //   }
+  // };
 
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem("access_token");
       await AsyncStorage.removeItem("refresh_token");
 
-      logout();
+      // logout();
 
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: "LetGetStarted" }],
-        })
-      );
+      // navigation.dispatch(
+      //   CommonActions.reset({
+      //     index: 0,
+      //     routes: [{ name: "LetGetStarted" }],
+      //   })
+      // );
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -97,7 +100,7 @@ export default function Settings({ navigation }) {
             <Text style={styles.profileName}>
               {toTitleCase(title + user.full_name)}
             </Text>
-            <Text style={styles.profileSpeciality}>{user.speciality}</Text>
+            <Text style={styles.profileSpeciality}>{user.specialization}</Text>
           </View>
         </Pressable>
 
@@ -106,7 +109,7 @@ export default function Settings({ navigation }) {
             <Pressable
               key={page.route || index}
               style={styles.settingsItem}
-              onPress={() => handleNavigate(page.route)}
+              // onPress={() => handleNavigate(page.route)}
             >
               <View style={styles.settingsItemLeft}>
                 <View style={styles.settingsItemIcon}>{page.icon}</View>

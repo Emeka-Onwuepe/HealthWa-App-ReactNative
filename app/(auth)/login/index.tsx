@@ -1,15 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Image, Pressable, Text, TextInput, View } from "react-native";
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-// import { z } from "zod";
-
-// import logo from "../../../assets/images/logo.png";
-// import logo from "../../../assets/images/logo.png";
-
-// import { login } from "../../api/services/auth.service";
+import { Image, Pressable, Text, TextInput, View } from "react-native";
 import Checkbox from "../../../components/ui/Checkbox";
 // import useAuthStore from "../../store/auth";
 import { addAlert } from "@/integrations/features/alert/alertSlice";
@@ -59,7 +51,7 @@ export default function Login() {
   
   useEffect(() => {
     if (user.logedin && !loading  && !isLoading) {
-      if (user.verified_email ) {
+      if (user.verified_email  && user.gender != 'other') {
         navigation.replace("/home");
       } else if (!user.verified_email){
         navigation.replace("/OTPVerification");

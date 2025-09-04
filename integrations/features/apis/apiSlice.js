@@ -77,10 +77,10 @@ export const mediAppApi = createApi({
 
         patient: builder.mutation({
             query: data => ({
-                url: `/patient`,
-                headers: { "Authorization": `Token ${data.token}` },
+                url: `/patient/patient`,
+                // headers: { "Authorization": `Token ${data.token}` },
                 method: "POST",
-                body: data.data,
+                body: data,
             }),
         }),
 

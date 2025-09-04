@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Pressable,
@@ -7,9 +8,6 @@ import {
   TextInput,
   View,
 } from "react-native";
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import { useMutation } from "@tanstack/react-query";
-import { Controller, useForm } from "react-hook-form";
 // import { z } from "zod";
 import { useRouter } from "expo-router";
 

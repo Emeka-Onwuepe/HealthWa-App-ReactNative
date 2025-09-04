@@ -1,12 +1,12 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import QuickAction from "../QuickAction";
-import FindMedic from "../FindMedic/FindMedic";
+import Settings from "../../../app/(dashboard)/settings";
 import Activities from "../Activities/Activities";
-import UpcomingAppointments from "../UpcomingAppointments";
-import Settings from "../Settings";
-import PleaseWait from "../PleaseWait";
+import FindMedic from "../FindMedic/FindMedic";
 import Paired from "../Paired";
+import PleaseWait from "../PleaseWait";
+import QuickAction from "../QuickAction";
 import Schedule from "../Schedule";
+import UpcomingAppointments from "../UpcomingAppointments";
 // import Settings from "../Settings";
 
 const QuickActionStack = createNativeStackNavigator();
