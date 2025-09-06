@@ -7,10 +7,12 @@ import {
 } from "react-native";
 
 import { sampleAppointments } from "@/types";
+import { useRouter } from "expo-router";
 import AppointmentCard from "../ui/AppointmentCard";
 
 export default function UpcomingAppointments() {
 
+  const navigation = useRouter();
   const isLoading = false
   const isError = false
   const error: { message?: string } | null = null
@@ -73,9 +75,9 @@ export default function UpcomingAppointments() {
       <View style={styles.header}>
         <Text style={styles.headerText}>Upcoming appointments</Text>
         <Pressable
-          // onPress={() =>
-          //   navigation.navigate("Appointment", { screen: "Appointment" })
-          // }
+          onPress={() =>
+            navigation.navigate("/appointment")
+          }
         >
           <Text style={styles.headerLink}>View All</Text>
         </Pressable>

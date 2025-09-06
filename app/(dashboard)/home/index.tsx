@@ -36,7 +36,7 @@ export default function Home() {
     const onPress = () => {};
 
     return (
-      <Pressable onPress={onPress} style={styles.profileButton}>
+      <Pressable onPress={()=>navigation.navigate('/settings/Profile')} style={styles.profileButton}>
         <Image source={imageSource} style={styles.profileButtonImage} />
       </Pressable>
     );

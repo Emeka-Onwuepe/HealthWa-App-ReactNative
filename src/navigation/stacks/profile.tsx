@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
+import Profile from "../../../app/(dashboard)/settings/profile";
 import SetupPatientProfile from "../../../app/setupPatientProfile";
-import Profile from "../../screens/Profile";
 import SetupProfile from "../../screens/setupProfile";
 
 const ProfileStack = createNativeStackNavigator();

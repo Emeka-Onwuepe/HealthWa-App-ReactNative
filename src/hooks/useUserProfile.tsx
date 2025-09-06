@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { UpdateProfileFormData } from "../screens/Profile";
+import { UpdateProfileFormData } from "../../app/(dashboard)/settings/profile";
 import { UserService } from "../api/user.service";
 
 export const useUserProfile = () => {

@@ -1,47 +1,61 @@
+// import { zodResolver } from "@hookform/resolvers/zod";
+import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
-  ScrollView,
-  View,
-  Text,
   Image,
-  TextInput,
   Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+// import { z } from "zod";
+// import { useUserProfile } from "../../../../src/hooks/useUserProfile";
+// import useAuthStore from "../../../../src/store/auth";
+import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
+import { useRouter } from "expo-router";
+import Button from "../../../../components/ui/Button";
+import PageHeader from "../../../../components/ui/PageHeader";
+import { getAvatarUrl } from "../../../../utils/avatars";
 import styles from "./styles";
-import PageHeader from "../../components/ui/PageHeader";
-import useAuthStore from "../../store/auth";
-import { z } from "zod";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import Button from "../../components/ui/Button";
-import { useUserProfile } from "../../hooks/useUserProfile";
-import { Toast } from "toastify-react-native";
-import { getAvatarUrl } from "../../utils/avatars";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import * as ImagePicker from "expo-image-picker";
 
-const updateProfileSchema = z.object({
-  email: z.string().email(),
-  phone_number: z.string(),
-  gender: z.string(),
-  speciality: z.string().optional(),
-  work_experience: z.string().optional(),
-  license_number: z.string().optional(),
-  about_me: z.string().optional(),
-});
+// const updateProfileSchema = z.object({
+//   email: z.string().email(),
+//   phone_number: z.string(),
+//   gender: z.string(),
+//   speciality: z.string().optional(),
+//   work_experience: z.string().optional(),
+//   license_number: z.string().optional(),
+//   about_me: z.string().optional(),
+// });
 
-export type UpdateProfileFormData = z.infer<typeof updateProfileSchema>;
+// export type UpdateProfileFormData = z.infer<typeof updateProfileSchema>;
+
+interface FormData {
+  email: string;
+  phone_number: string;
+  gender: string;
+  speciality: string;
+  work_experience: string;
+  license_number: string;
+  about_me: string;
+}
 
 export default function Profile() {
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false); // State to toggle between view and edit mode
 
-  const { user, setUser } = useAuthStore();
+    const navigation = useRouter();
+    const dispatch = useAppDispatch();
+    const user = useAppSelector(state => state.user);
+
+  // const { user, setUser } = useAuthStore();
 
   const avatarUrl = getAvatarUrl(user.full_name);
 
-  const isDoctor = user.role === "doctor" ?? "doctor";
+  const isDoctor = user.role === "practitioner" ? "doctor": '';
   const title = isDoctor ? "Dr. " : "";
   const imageSource = user.profile_image
     ? { uri: user.profile_image }
@@ -52,20 +66,19 @@ export default function Profile() {
     handleSubmit,
     reset,
     formState: { isSubmitting, isDirty, errors },
-  } = useForm<UpdateProfileFormData>({
-    resolver: zodResolver(updateProfileSchema),
+  } = useForm<FormData>({
     defaultValues: {
       email: user.email,
       phone_number: user.phone_number,
       gender: user.gender ?? "",
-      speciality: user.speciality ?? "",
+      speciality: user.specialization ?? "",
       work_experience: user.work_experience ?? "",
       about_me: user.about_me ?? "",
       license_number: user.license_number ?? "",
     },
   });
 
-  const { updateProfile, uploadProfileImage } = useUserProfile();
+  // const { updateProfile, uploadProfileImage } = useUserProfile();
 
   const handlePickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -83,49 +96,49 @@ export default function Profile() {
   };
 
   const handleImageUpload = async (uri: string) => {
-    const formData = new FormData();
+    // const formData = new FormData();
 
-    const filename = uri.split("/").pop();
-    const match = /\.(\w+)$/.exec(filename);
-    const type = match ? `image/${match[1]}` : `image`;
+    // const filename = uri.split("/").pop();
+    // const match = /\.(\w+)$/.exec(filename);
+    // const type = match ? `image/${match[1]}` : `image`;
 
-    formData.append("file", {
-      uri,
-      name: filename,
-      type,
-    } as unknown as Blob);
+    // formData.append("file", {
+    //   uri,
+    //   name: filename,
+    //   type,
+    // } as unknown as Blob);
 
-    try {
-      const res = await uploadProfileImage(formData);
-      console.log(res);
-    } catch (error) {
-      console.error(error);
-    }
+    // try {
+    //   const res = await uploadProfileImage(formData);
+    //   console.log(res);
+    // } catch (error) {
+    //   console.error(error);
+    // }
   };
 
-  const handleUpdateProfile = async (data: UpdateProfileFormData) => {
-    try {
-      const res = await updateProfile(data);
+  const handleUpdateProfile = async (data: FormData) => {
+    // try {
+    //   const res = await updateProfile(data);
 
-      Toast.success("Your profile information has been updated");
+    //   Toast.success("Your profile information has been updated");
 
-      // Update user data
-      setUser(res.data);
+    //   // Update user data
+    //   // setUser(res.data);
 
-      reset({
-        email: res.data.email,
-        phone_number: res.data.phone_number,
-        gender: res.data.gender ?? "",
-        speciality: res.data.speciality ?? "",
-        work_experience: res.data.work_experience ?? "",
-        about_me: res.data.about_me ?? "",
-        license_number: res.data.license_number ?? "",
-      });
+    //   reset({
+    //     email: res.data.email,
+    //     phone_number: res.data.phone_number,
+    //     gender: res.data.gender ?? "",
+    //     speciality: res.data.speciality ?? "",
+    //     work_experience: res.data.work_experience ?? "",
+    //     about_me: res.data.about_me ?? "",
+    //     license_number: res.data.license_number ?? "",
+    //   });
 
-      setIsEditing(false); // Switch back to view mode
-    } catch (error) {
-      console.error(error);
-    }
+    //   setIsEditing(false); // Switch back to view mode
+    // } catch (error) {
+    //   console.error(error);
+    // }
   };
 
   return (
@@ -138,7 +151,7 @@ export default function Profile() {
           </Pressable>
           <Text style={styles.profileName}> {title + user.full_name}</Text>
           {isDoctor ? (
-            <Text style={styles.profileSpeciality}>{user.speciality}</Text>
+            <Text style={styles.profileSpeciality}>{user.specialization}</Text>
           ) : null}
         </View>
 
@@ -166,9 +179,9 @@ export default function Profile() {
               {isDoctor && (
                 <>
                   <View style={styles.valueContainer}>
-                    <Text style={styles.label}>Speciality</Text>
+                    <Text style={styles.label}>Specialization</Text>
                     <Text style={styles.value}>
-                      {user.speciality || "Not specified"}
+                      {user.specialization || "Not specified"}
                     </Text>
                   </View>
 
@@ -195,12 +208,11 @@ export default function Profile() {
                 </>
               )}
 
-              <Button
-                onPress={() => setIsEditing(true)}
-                style={styles.editButton}
-              >
-                <Text style={styles.buttonText}>Edit Profile</Text>
-              </Button>
+              <View style={styles.editButton}>
+                <Button onPress={() => setIsEditing(true)}>
+                  <Text style={styles.buttonText}>Edit Profile</Text>
+                </Button>
+              </View>
             </View>
           ) : (
             // Edit Mode

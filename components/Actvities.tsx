@@ -1,13 +1,15 @@
+import { useRouter } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import ActivityCard from "./ui/ActivitiesCard";
 
 export default function Activities() {
+  const navigation  = useRouter()
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>Activities</Text>
         <Pressable 
-        // onPress={() => navigation.navigate("Activities")}
+        onPress={() => navigation.navigate("/activities")}
           >
           <Text style={styles.headerLink}>View All</Text>
         </Pressable>

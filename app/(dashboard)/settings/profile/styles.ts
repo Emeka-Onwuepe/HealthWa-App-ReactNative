@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { fontFamily } from "../../constants/typography";
+import { fontFamily } from "../../../../constants/typography";
 
 const styles = StyleSheet.create({
   container: {
@@ -63,6 +63,13 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+  editButton: {
+    backgroundColor: "#11B3CF",
+    borderRadius: 25,
+    paddingVertical: 3,
+    paddingHorizontal: 4,
+    alignItems: "center",
   },
   valueContainer: {
     flexDirection: "column",
