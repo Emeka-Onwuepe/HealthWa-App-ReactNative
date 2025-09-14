@@ -1,19 +1,52 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { readFromAsyncStorage, writeToAsyncStorage } from '../../async_store';
 
-const initialData = {
-  id: 0, full_name: "", email: "",
-  role: "", phone_number: '',
-  specialization: '', verified_phone_number: false, 
-  verified_email: false, usertoken: "",
-  profile_image: "", gender: "",
-  about_me: "", license_number: "",
-  work_experience: '', logedin: false,
+// const initialData = {
+//   id: 0, full_name: "", email: "",
+//   role: "", phone_number: '',
+//   specialization: '', verified_phone_number: false, 
+//   verified_email: false, usertoken: "",
+//   profile_image: "", gender: "",
+//   about_me: "", license_number: "",
+//   years_of_experience: 0, logedin: false,
 
-  patient_count: 0, male_count: 0,
-  female_count:0 , 
-  biography: "", date_of_birth: '',
-  // work_experience: 0, logedin: false,
+//   patient_count: 0, male_count: 0,
+//   female_count:0 , 
+//   biography: "", date_of_birth: '',
+//   // years_of_experience: 0, logedin: false,
+// }
+
+const initialData = {
+  id: 0,
+  full_name: "",
+  email: "",
+  role: "",
+  profile_image: "",
+  gender: "",
+  phone_number: "",
+  about_me: "",
+  date_of_birth: "",
+  verified_phone_number: false, 
+  verified_email: false, 
+  usertoken: "",
+  logedin: false,
+  // doctors attr
+  specialization: "",
+  license_number: "",
+  years_of_experience: 0,
+  place_of_work: "",
+  city_of_practice: "",
+  state_of_practice: "",
+  region: "",
+  time_zone: "",
+  // patient attr
+  occupation: "",
+  weight: "",
+  height: "",
+  is_diabetic: false,
+  is_asthmatic: false,
+  medications: "",
+  on_long_term_meds: "",
 }
 
 

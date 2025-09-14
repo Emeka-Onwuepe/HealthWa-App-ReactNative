@@ -26,7 +26,7 @@ import styles from "./styles";
 //   phone_number: z.string(),
 //   gender: z.string(),
 //   speciality: z.string().optional(),
-//   work_experience: z.string().optional(),
+//   years_of_experience: z.string().optional(),
 //   license_number: z.string().optional(),
 //   about_me: z.string().optional(),
 // });
@@ -38,7 +38,7 @@ interface FormData {
   phone_number: string;
   gender: string;
   speciality: string;
-  work_experience: string;
+  years_of_experience: number;
   license_number: string;
   about_me: string;
 }
@@ -72,7 +72,7 @@ export default function Profile() {
       phone_number: user.phone_number,
       gender: user.gender ?? "",
       speciality: user.specialization ?? "",
-      work_experience: user.work_experience ?? "",
+      years_of_experience: user.years_of_experience ?? 0,
       about_me: user.about_me ?? "",
       license_number: user.license_number ?? "",
     },
@@ -130,7 +130,7 @@ export default function Profile() {
     //     phone_number: res.data.phone_number,
     //     gender: res.data.gender ?? "",
     //     speciality: res.data.speciality ?? "",
-    //     work_experience: res.data.work_experience ?? "",
+    //     years_of_experience: res.data.years_of_experience ?? "",
     //     about_me: res.data.about_me ?? "",
     //     license_number: res.data.license_number ?? "",
     //   });
@@ -188,7 +188,7 @@ export default function Profile() {
                   <View style={styles.valueContainer}>
                     <Text style={styles.label}>Work Experience</Text>
                     <Text style={styles.value}>
-                      {user.work_experience || "Not specified"}
+                      {user.years_of_experience || "Not specified"}
                     </Text>
                   </View>
 
@@ -286,14 +286,14 @@ export default function Profile() {
                   />
                   <Controller
                     control={control}
-                    name="work_experience"
+                    name="years_of_experience"
                     render={({ field: { onChange, value } }) => (
                       <View>
                         <Text style={styles.formLabel}>Work Experience</Text>
                         <TextInput
                           placeholder="Work Experience"
                           style={styles.formInput}
-                          value={value}
+                          value={value.toString()}
                           onChangeText={onChange}
                           keyboardType="default"
                         />

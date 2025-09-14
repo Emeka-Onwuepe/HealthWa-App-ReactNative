@@ -1,44 +1,36 @@
-import { SafeAreaView } from "react-native-safe-area-context";
-import PageHeader from "../../components/ui/PageHeader";
-import { Text, TextInput, View, ScrollView } from "react-native";
+import { addAlert } from "@/integrations/features/alert/alertSlice";
+import { useHandlePasswordMutation } from "@/integrations/features/apis/apiSlice";
+import { logoutUser } from "@/integrations/features/user/usersSlice";
+import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
+import { useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { ScrollView, Text, TextInput, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Button from "../../../../components/ui/Button";
+import PageHeader from "../../../../components/ui/PageHeader";
 import styles from "./styles";
-import Button from "../../components/ui/Button";
-import { Toast } from "toastify-react-native";
-import { useUserProfile } from "../../hooks/useUserProfile";
 
-const changePasswordSchema = z
-  .object({
-    old_password: z
-      .string()
-      .min(1, "Old password is required")
-      .min(6, "Password must be at least 6 characters"),
-    new_password: z
-      .string()
-      .min(1, "New password is required")
-      .min(6, "Password must be at least 6 characters"),
-    confirm_password: z
-      .string()
-      .min(1, "Confirm password is required")
-      .min(6, "Password must be at least 6 characters"),
-  })
-  .refine((data) => data.new_password === data.confirm_password, {
-    message: "New passwords don't match",
-    path: ["confirm_password"],
-  });
 
-export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
+
+interface ChangePasswordFormData {
+  old_password: string,
+  new_password: string,
+  confirm_password: string,
+}
+
 
 export default function ChangePassword() {
+  const navigation = useRouter();
+  const user = useAppSelector(state => state.user);
+  const dispatch = useAppDispatch();
+  const [handlePassword, {isLoading}] = useHandlePasswordMutation()
+
   const {
     control,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm<ChangePasswordFormData>({
-    resolver: zodResolver(changePasswordSchema),
     defaultValues: {
       old_password: "",
       new_password: "",
@@ -46,24 +38,29 @@ export default function ChangePassword() {
     },
   });
 
-  const { updatePassword } = useUserProfile();
 
   const onSubmit = async (data: ChangePasswordFormData) => {
-    try {
-      const res = await updatePassword({
-        new_password: data.new_password,
-        old_password: data.old_password,
-      });
 
-      console.log(res);
-
-      Toast.success("Password changed successfully!");
-
-      // clear form inputs
-      reset();
-    } catch (error) {
-      console.log("Change Password Error:", JSON.stringify(error));
+    const data_ = {
+      usertoken : user.usertoken,
+      action : 'reset_password',
+      new_password : data.new_password,
+      old_password : data.old_password,
     }
+
+    const res = await handlePassword(data_)
+
+    if(res.data){
+      console.log(res)
+      let success = {status:200,  message: 'Password reset successfully'}
+      dispatch(addAlert({...success, page: "changePasswordPage"}))
+      logoutUser()
+      navigation.replace('/login')
+
+    }else if (res.error) {
+    dispatch(addAlert({ ...res.error, page: "changePasswordPage" }));
+       }
+   
   };
 
   return (
@@ -161,3 +158,5 @@ export default function ChangePassword() {
     </SafeAreaView>
   );
 }
+
+

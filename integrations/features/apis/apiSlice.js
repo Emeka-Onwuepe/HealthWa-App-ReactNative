@@ -40,28 +40,29 @@ export const mediAppApi = createApi({
             invalidatesTags: ['userlogin']
         }),
 
-        changePassword: builder.mutation({
+        handlePassword: builder.mutation({
             query: data => ({
-                url: "/user/changepassword",
+                url: "/user/password",
                 // headers: { "Authorization": `Token ${data.token}`},
                 method: "POST",
                 body: data
             }),
         }),
         
-        forgotPassword: builder.mutation({
-            query: data => ({
-                url: "/user/forgotpassword",
-                method: "POST",
-                body: data
-            }),
-        }),
+        // forgotPassword: builder.mutation({
+        //     query: data => ({
+        //         url: "/user/forgotpassword",
+        //         method: "POST",
+        //         body: data
+        //     }),
+        // }),
 
         logout: builder.mutation({
             query: token => ({
                 url: `/user/logout`,
                 // headers: { "Authorization": `Token ${token}` },
                 method: "POST",
+                body: {usertoken:token}
             }),
         }),
 
@@ -78,6 +79,16 @@ export const mediAppApi = createApi({
         patient: builder.mutation({
             query: data => ({
                 url: `/patient/patient`,
+                // headers: { "Authorization": `Token ${data.token}` },
+                method: "POST",
+                body: data,
+            }),
+        }),
+
+        
+        practitioner: builder.mutation({
+            query: data => ({
+                url: `/practitioner/practitioner`,
                 // headers: { "Authorization": `Token ${data.token}` },
                 method: "POST",
                 body: data,
@@ -120,6 +131,6 @@ export const {
     useLogoutMutation, useOTPMutation,
     useAppointmentsMutation,
     usePatientMutation, 
-    useChangePasswordMutation,
-    useForgotPasswordMutation
+    usePractitionerMutation,
+    useHandlePasswordMutation,
 } = mediAppApi

@@ -1,4 +1,6 @@
-export interface User {
+
+  export interface User {
+  // general user attr
   id: string;
   full_name: string;
   email: string;
@@ -6,7 +8,27 @@ export interface User {
   profile_image?: string;
   gender?: string;
   phone_number?: string;
+  about_me: string;
+  date_of_birth?: Date | string;
+  // doctors attr
+  specialization: string;
+  license_number: string;
+  years_of_experience: Number;
+  place_of_work: string;
+  city_of_practice: string;
+  state_of_practice: string;
+  region?: string;
+  time_zone?: string;
+  // patient attr
+  occupation: string;
+  weight: string;
+  height: string;
+  is_diabetic: boolean;
+  is_asthmatic: boolean;
+  medications: string;
+  on_long_term_meds: string;
 }
+
 
 export interface Prescription {}
 

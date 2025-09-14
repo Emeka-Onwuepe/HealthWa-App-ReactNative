@@ -1,6 +1,7 @@
+import { useLogoutMutation } from "@/integrations/features/apis/apiSlice";
+import { logoutUser } from "@/integrations/features/user/usersSlice";
 import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
@@ -10,44 +11,14 @@ import { getAvatarUrl } from "../../../utils/avatars";
 import { toTitleCase } from "../../../utils/strings";
 import styles from "./styles";
 
-const pages = [
-  {
-    title: "Password",
-    icon: <Ionicons name="lock-closed-outline" size={24} color="#555" />,
-    route: "ChangePassword",
-  },
-  {
-    title: "Notification",
-    icon: <Ionicons name="notifications-outline" size={24} color="#555" />,
-    route: "Notification",
-  },
-  {
-    title: "Reminder",
-    icon: <Ionicons name="alarm-outline" size={24} color="#555" />,
-    route: "ReminderSettings",
-  },
-  {
-    title: "Data Protection",
-    icon: <Ionicons name="shield-checkmark-outline" size={24} color="#555" />,
-    route: "DataProtection",
-  },
-  {
-    title: "FAQ",
-    icon: <Ionicons name="help-circle-outline" size={24} color="#555" />,
-    route: "Faq",
-  },
-  {
-    title: "Privacy",
-    icon: <Ionicons name="shield-outline" size={24} color="#555" />,
-    route: "PrivacyPolicy",
-  },
-];
 
 export default function Settings() {
   // const { user, logout } = useAuthStore();
+
   const navigation = useRouter()
   const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.user);
+  const [logout,{isLoading}] = useLogoutMutation()
 
   const avatarUrl = getAvatarUrl(user.full_name);
   const isDoctor = user.role === "practitioner";
@@ -59,33 +30,15 @@ export default function Settings() {
   const title = isDoctor ? "Dr. " : "";
 
   const handleProfilePress = () => {
-    // navigation.navigate("Profile");
+    navigation.navigate("/settings/profile");
   };
 
-  // const handleNavigate = (route: string) => {
-  //   try {
-  //     navigation.navigate(route);
-  //   } catch (error) {
-  //     console.warn(`Navigation Error: Could not find screen "${route}".`);
-  //   }
-  // };
 
   const handleLogout = async () => {
-    try {
-      await AsyncStorage.removeItem("access_token");
-      await AsyncStorage.removeItem("refresh_token");
+      logout(user.usertoken)
+      dispatch(logoutUser())
+      navigation.replace('/login')
 
-      // logout();
-
-      // navigation.dispatch(
-      //   CommonActions.reset({
-      //     index: 0,
-      //     routes: [{ name: "LetGetStarted" }],
-      //   })
-      // );
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
   };
 
   return (
@@ -105,15 +58,13 @@ export default function Settings() {
         </Pressable>
 
         <View style={styles.settingsContainer}>
-          {pages.map((page, index) => (
-            <Pressable
-              key={page.route || index}
+          <Pressable
               style={styles.settingsItem}
-              // onPress={() => handleNavigate(page.route)}
+              onPress={() => navigation.navigate('/settings/changePassword')}
             >
               <View style={styles.settingsItemLeft}>
-                <View style={styles.settingsItemIcon}>{page.icon}</View>
-                <Text style={styles.settingsItemText}>{page.title}</Text>
+                <View style={styles.settingsItemIcon}> <Ionicons name="lock-closed-outline" size={24} color="#555" /></View>
+                <Text style={styles.settingsItemText}>"Password"</Text>
               </View>
 
               <Ionicons
@@ -122,7 +73,86 @@ export default function Settings() {
                 color="black"
               />
             </Pressable>
-          ))}
+
+             <Pressable
+              style={styles.settingsItem}
+              onPress={() => navigation.navigate('/settings/notification')}
+            >
+              <View style={styles.settingsItemLeft}>
+                <View style={styles.settingsItemIcon}><Ionicons name="notifications-outline" size={24} color="#555" /></View>
+                <Text style={styles.settingsItemText}>Notification</Text>
+              </View>
+
+              <Ionicons
+                name="chevron-forward-outline"
+                size={24}
+                color="black"
+              />
+            </Pressable>
+ 
+             <Pressable
+              style={styles.settingsItem}
+              onPress={() => navigation.navigate('/settings/reminderSettings')}
+            >
+              <View style={styles.settingsItemLeft}>
+                <View style={styles.settingsItemIcon}><Ionicons name="alarm-outline" size={24} color="#555" /></View>
+                <Text style={styles.settingsItemText}>Reminder</Text>
+              </View>
+
+              <Ionicons
+                name="chevron-forward-outline"
+                size={24}
+                color="black"
+              />
+            </Pressable>
+
+             <Pressable
+              style={styles.settingsItem}
+              onPress={() => navigation.navigate('/settings/dataProtection')}
+            >
+              <View style={styles.settingsItemLeft}>
+                <View style={styles.settingsItemIcon}><Ionicons name="shield-checkmark-outline" size={24} color="#555" /></View>
+                <Text style={styles.settingsItemText}>Data Protection</Text>
+              </View>
+
+              <Ionicons
+                name="chevron-forward-outline"
+                size={24}
+                color="black"
+              />
+            </Pressable>
+
+             <Pressable
+              style={styles.settingsItem}
+              onPress={() => navigation.navigate('/settings/faq')}
+            >
+              <View style={styles.settingsItemLeft}>
+                <View style={styles.settingsItemIcon}><Ionicons name="help-circle-outline" size={24} color="#555" /></View>
+                <Text style={styles.settingsItemText}>FAQ</Text>
+              </View>
+
+              <Ionicons
+                name="chevron-forward-outline"
+                size={24}
+                color="black"
+              />
+            </Pressable>
+
+             <Pressable
+              style={styles.settingsItem}
+              onPress={() => navigation.navigate('/settings/privacyPolicy')}
+            >
+              <View style={styles.settingsItemLeft}>
+                <View style={styles.settingsItemIcon}><Ionicons name="shield-outline" size={24} color="#555" /></View>
+                <Text style={styles.settingsItemText}>Privacy</Text>
+              </View>
+
+              <Ionicons
+                name="chevron-forward-outline"
+                size={24}
+                color="black"
+              />
+            </Pressable>
         </View>
 
         <Pressable style={styles.logoutButton} onPress={handleLogout}>

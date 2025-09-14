@@ -33,10 +33,11 @@ export default function Home() {
       ? { uri: user.profile_image }
       : { uri: avatarUrl };
 
+      console.log(imageSource)
     const onPress = () => {};
 
     return (
-      <Pressable onPress={()=>navigation.navigate('/settings/Profile')} style={styles.profileButton}>
+      <Pressable onPress={()=>navigation.navigate('/settings')} style={styles.profileButton}>
         <Image source={imageSource} style={styles.profileButtonImage} />
       </Pressable>
     );
@@ -53,6 +54,7 @@ export default function Home() {
       />
       {/* <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}> */}
         <View style={styles.topDisplay}>
+        
           <Image source={require("../../../assets/images/pharma.png")} style={styles.backgroundImage} />
           <View style={styles.upperTxt}>
             <Text style={styles.taskTxt}>What would you like today?</Text>

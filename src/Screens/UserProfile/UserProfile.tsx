@@ -1,26 +1,27 @@
+
+// import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
+import { Picker } from "@react-native-picker/picker";
+import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
 import {
-  Button,
   Image,
   Pressable,
   ScrollView,
   Text,
   TextInput,
-  View,
+  View
 } from "react-native";
+import RadioGroup, { RadioButtonProps } from "react-native-radio-buttons-group";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "./styles";
-import RadioGroup, { RadioButtonProps } from "react-native-radio-buttons-group";
-import * as ImagePicker from "expo-image-picker";
-import DateTimePicker, {
-  DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
-import { Picker } from "@react-native-picker/picker";
-import { auth } from "../../../firebaseConfig";
 
-export default function UserProfile({ navigation }) {
+export default function UserProfile() {
+  const navigation = useRouter();
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [profileImage, setProfileImage] = useState("");
@@ -104,19 +105,19 @@ export default function UserProfile({ navigation }) {
   };
 
   const saveProfile = () => {
-    alert("Profile submitted successfully.");
-    navigation.navigate("Home");
-    const userData = {
-      profileImage,
-      // fullName,
-      // phone,
-      // email,
-      dob,
-      diabeticSelectedId,
-      asthmaticSelectedId,
-      medicationId,
-      gender,
-    };
+    // alert("Profile submitted successfully.");
+    // navigation.navigate("/home");
+    // const userData = {
+    //   profileImage,
+    //   // fullName,
+    //   // phone,
+    //   // email,
+    //   dob,
+    //   diabeticSelectedId,
+    //   asthmaticSelectedId,
+    //   medicationId,
+    //   gender,
+    // };
 
     // console.log("User Data:", userData);
   };
@@ -141,7 +142,7 @@ export default function UserProfile({ navigation }) {
                 onPress={handleImagePicker}
                 style={styles.uploadButton}
               >
-                <FontAwesomeIcon icon={faUser} size={25} color="black" />
+                <FontAwesomeIcon  icon='user' size={25} color="black" />
                 <Text style={styles.uploadTxt}>Upload Image</Text>
               </Pressable>
             )}

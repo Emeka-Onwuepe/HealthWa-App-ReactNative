@@ -10,16 +10,7 @@ import { loginUser } from "@/integrations/features/user/usersSlice";
 import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
 import styles from "./styles";
 
-// const loginSchema = z.object({
-//   email: z.string().email("Invalid email address"),
-//   password: z
-//     .string()
-//     .min(6, "Password must be at least 6 characters")
-//     .max(50, "Password must be less than 50 characters"),
-//   remember_me: z.boolean().optional().default(false),
-// });
 
-// export type LoginFormData = z.infer<typeof loginSchema>;
 
 type FormData = {
   email: string;
@@ -56,7 +47,12 @@ export default function Login() {
       } else if (!user.verified_email){
         navigation.replace("/OTPVerification");
       } else if(user.gender == 'other') {
-        navigation.replace("/setupPatientProfile");
+
+         if(user.role == 'practitioner') {
+          navigation.navigate("/setupProfile");
+        } else {
+          navigation.navigate("/setupPatientProfile");
+        }
       }
     }
   }, [loading,user]);
@@ -91,12 +87,18 @@ export default function Login() {
         })
       ); 
 
-      if(res.data.user.gender == 'other') {
-        navigation.navigate("/setupPatientProfile");
-      }else{
-        navigation.navigate("/home");
-      }
+       if (res.data.user.verified_email  && res.data.user.gender != 'other') {
+        navigation.replace("/home");
+        } else if (!res.data.user.verified_email){
+        navigation.replace("/OTPVerification");
+        } else if(res.data.user.gender == 'other') {
 
+         if(res.data.user.role == 'practitioner') {
+          navigation.navigate("/setupProfile");
+        } else {
+          navigation.navigate("/setupPatientProfile");
+        }
+      }
 
 
     } else if (res.error) {

@@ -34,7 +34,9 @@ export default function Signup() {
   const navigation = useRouter();
   const { role } = useLocalSearchParams<{ role?: string }>();
 
-    const [registerUser, { isLoading:loading }] = useRegisterUserMutation();
+  console.log("Role from params:", role);
+
+  const [registerUser, { isLoading: loading }] = useRegisterUserMutation();
 
   const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.user);
@@ -103,6 +105,7 @@ export default function Signup() {
       };
 
       let res = await registerUser(data);
+      console.log(res)
       if (res.data) {
         dispatch(
           loginUser({
@@ -113,7 +116,7 @@ export default function Signup() {
           })
         );
         // dispatch(userRegistered());
-        navigation.navigate("../OTPVerification");
+        navigation.navigate("/OTPVerification");
       } else if (res.error) {
         dispatch(addAlert({ ...res.error, page: "signup" }));
       }

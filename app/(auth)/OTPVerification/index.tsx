@@ -43,7 +43,11 @@ export default function Verification() {
 
   useEffect(() => {
     if (user.verified_email) {
-      navigation.replace("/setupPatientProfile");
+       if(user.role == 'practitioner') {
+          navigation.navigate("/setupProfile");
+        } else {
+          navigation.navigate("/setupPatientProfile");
+        }
     }
   }, [user.verified_email]);
 
@@ -115,7 +119,11 @@ export default function Verification() {
           })
         );
         dispatch(verify('verified_email'));
-        navigation.replace("/setupPatientProfile");
+         if(user.role == 'practitioner') {
+          navigation.navigate("/setupProfile");
+        } else {
+          navigation.navigate("/setupPatientProfile");
+        }
       }
       // setOtpSent(true);
       // setResendTimer(90);

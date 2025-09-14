@@ -2,11 +2,11 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import Home from "../../../app/(dashboard)/Home";
 import Settings from "../../../app/(dashboard)/settings";
-import ChangePassword from "../../screens/ChangePassword";
-import DataProtection from "../../screens/DataProtection";
-import FAQ from "../../screens/FAQ";
-import Notification from "../../screens/Notification";
-import PrivacyPolicy from "../../screens/PrivacyPolicy";
+import ChangePassword from "../../../app/(dashboard)/settings/changePassword";
+import DataProtection from "../../../app/(dashboard)/settings/dataProtection";
+import FAQ from "../../../app/(dashboard)/settings/faq";
+import Notification from "../../../app/(dashboard)/settings/notification";
+import PrivacyPolicy from "../../../app/(dashboard)/settings/privacyPolicy";
 
 const HomeStack = createNativeStackNavigator();
 

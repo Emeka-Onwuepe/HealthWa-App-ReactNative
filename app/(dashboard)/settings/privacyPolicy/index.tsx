@@ -1,7 +1,7 @@
-import { ScrollView, View, Text } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import PageHeader from "../../../../components/ui/PageHeader";
 import styles from "./styles";
-import PageHeader from "../../components/ui/PageHeader";
 
 export default function PrivacyPolicy() {
   return (

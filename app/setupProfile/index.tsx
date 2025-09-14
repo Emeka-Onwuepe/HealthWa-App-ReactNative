@@ -1,52 +1,36 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import * as DocumentPicker from "expo-document-picker";
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-// import { z } from "zod";
-// import { updateDoctorProfile } from "../../api/services/user.service";
-import Button from "../../../components/ui/Button";
-import PageHeader from "../../../components/ui/PageHeader";
-import SelectInput from "../../../components/ui/Select";
-import TextInput from "../../../components/ui/TextInput";
-// import useAuthStore from "../../../store/auth";
-import { Gender } from "../../../types";
-// import { getApiErrorMessage } from "../../utils/errors";
-import { useRouter } from "expo-router";
+import Button from "../../components/ui/Button";
+import PageHeader from "../../components/ui/PageHeader";
+import SelectInput from "../../components/ui/Select";
+import TextInput from "../../components/ui/TextInput";
+import { Gender } from "../../types";
 
-import { convertEnumToPickerObject } from "../../../utils/type";
+
+import { addAlert } from "@/integrations/features/alert/alertSlice";
+import { usePractitionerMutation } from "@/integrations/features/apis/apiSlice";
+import { addPatients } from "@/integrations/features/patient/patientsSlice";
+import { loginUser } from "@/integrations/features/user/usersSlice";
+import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
+import { convertEnumToPickerObject } from "../../utils/type";
 import styles from "./styles";
 
 const genderItems = convertEnumToPickerObject(Gender);
 
 export default function SetupProfile() {
   const navigation = useRouter();
-  const [licenseFile, setLicenseFile] = useState<DocumentPicker.DocumentPickerResult | null>(null);
-  // const { user, setUser, isDoctor } = useAuthStore();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(state => state.user);
+  const [calendarVisible, setCalendarVisible] = useState(false);
+  // const [isLoading,setLoading] = useState(false)
+  const [practitioner, { isLoading }] = usePractitionerMutation();
 
-  // const createValidationSchema = () => {
-  //   let baseSchema = z.object({
-  //     specialization: z.string().min(1, "Specialization is required"),
-  //     gender: z.string().min(1, "Gender is required"),
-  //     license_number: z.string().min(1, "License number is required"),
-  //     years_of_experience: z.string().min(1, "Years of experience is required"),
-  //     place_of_work: z.string().min(1, "Place of work is required"),
-  //     city_of_practice: z.string().min(1, "City of practice is required"),
-  //     state_of_practice: z.string().min(1, "State of practice is required"),
-  //     region: z.string().optional(),
-  //     time_zone: z.string().optional(),
-  //     about_me: z.string().min(1, "About Me is required"),
-  //   });
 
-  //   return baseSchema;
-  // };
-
-  // const setupProfileSchema = createValidationSchema();
-
-  // type SetupProfileForm = z.infer<typeof setupProfileSchema>;
-
-  // Define the SetupProfileForm type
   type SetupProfileForm = {
     specialization: string;
     gender: string;
@@ -58,43 +42,15 @@ export default function SetupProfile() {
     region?: string;
     time_zone?: string;
     about_me: string;
-  };
+    date_of_birth?: Date | string;
 
-  type user = {
-    specialization: string;
-    gender: string;
-    license_number: string;
-    years_of_experience: string;
-    place_of_work: string;
-    city_of_practice: string;
-    state_of_practice: string;
-    region?: string;
-    time_zone?: string;
-    about_me: string;
-    full_name?: string;
-    phone_number?: string;
-    email?: string;
   };
-
-  const [user, setUser] = useState({
-    specialization: "",
-    gender: "",
-    license_number: "",
-    years_of_experience: "",
-    place_of_work: "",
-    city_of_practice: "",
-    state_of_practice: "",
-    region: "",
-    time_zone: "",
-    about_me: "",
-    full_name: "",
-    phone_number: "",
-    email: "",
-  });
 
     const {
       control,
       handleSubmit,
+      setValue,
+      getValues,
       formState: { errors },
       reset,
     } = useForm<SetupProfileForm>({
@@ -103,6 +59,8 @@ export default function SetupProfile() {
         gender: user?.gender || "",
         license_number: user?.license_number || "",
         years_of_experience: user?.years_of_experience?.toString() || "",
+        date_of_birth: new Date().toISOString().split("T")[0],
+        
         place_of_work: user?.place_of_work || "",
         city_of_practice: user?.city_of_practice || "",
         state_of_practice: user?.state_of_practice || "",
@@ -116,52 +74,43 @@ export default function SetupProfile() {
     reset(undefined, { keepValues: true });
   }, [reset]);
 
-  const handlePickDocument = async () => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: ["application/pdf", "image/*"],
-        copyToCacheDirectory: true,
-      });
 
-      if (result.assets && result.assets.length > 0) {
-        setLicenseFile(result);
-      }
-    } catch (error) {
-      console.error("Error picking document:", error);
-    }
-  };
-
-  // const { mutate, isPending } = useMutation({
-  //   mutationFn: (data: SetupProfileForm) => {
-  //     return updateDoctorProfile(data);
-  //   },
-  //   onSuccess: (response) => {
-  //     setUser({ ...user, ...response.data.data });
-  //     Toast.success("Profile setup completed successfully");
-  //     navigation.dispatch(
-  //       CommonActions.reset({
-  //         index: 0,
-  //         routes: [
-  //           { name: "Profile" },
-  //         ],
-  //       })
-  //     );
-  //   },
-  //   onError: (error) => {
-  //     console.error("Error setting up profile:", error);
-  //     const errorMessage = getApiErrorMessage(
-  //       error,
-  //       "Failed to setup profile. Please try again."
-  //     );
-  //     Toast.error(errorMessage);
-  //   },
-  // });
-
-  const [loading, setLoading] = useState(false);
-
-  const onSubmit = (data: SetupProfileForm) => {
-    
-  };
+    const onSubmit = async (data:SetupProfileForm) => {
+      const data_ = {
+        action: "create",
+        usertoken:user.usertoken,
+        data: {
+        ...data,
+        user_id: user.id,
+         }
+          }
+           console.log(data_)
+          let res = await practitioner(data_);
+         
+           if (res.data) {
+                dispatch(
+                  loginUser({
+                    ...res.data.user,
+                    logedin: true,
+                    save: true,
+                  })
+                ); 
+  
+                dispatch(
+                  addPatients({data:res.data.patient,save:true,})
+                ); 
+                
+          
+                if(res.data.user.gender != 'other') {
+                  navigation.replace("/home");
+                }
+          
+          
+          
+              } else if (res.error) {
+                dispatch(addAlert({ ...res.error, page: "patientSetupPage" }));
+              }
+        };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -189,6 +138,47 @@ export default function SetupProfile() {
             <Text style={styles.value}>{user.email}</Text>
           </View>
         </View>
+
+         <View style={{ marginTop: 10, marginBottom: 20 }}>
+            <Text style={styles.label}>Date of Birth</Text>
+            <TouchableOpacity onPress={() => setCalendarVisible(true)} 
+              style={{ borderColor: "#11B3CF", borderWidth: 1, borderRadius: 50, 
+                      marginTop: 10}}>
+            <View style={[{ flexDirection: "row", alignItems: "center", padding: 10, marginLeft: 10 }]}>
+              <Ionicons
+                name="calendar-outline"
+                size={20}
+                style={{ marginRight: 8 }}
+                />
+                <Controller
+                control={control}
+                name="date_of_birth"
+                render={({ field: { value } }) => (
+                <Text>
+                {value ? (typeof value === "string" ? value : value.toISOString().split("T")[0]) : ""}
+                </Text>
+                )}
+                />
+                </View>
+                </TouchableOpacity>
+                </View>
+        
+                {/* Date Picker Modal */}
+                  {calendarVisible && (
+                     <View>
+                  <DateTimePicker
+                    value={new Date(getValues("date_of_birth") ?? new Date().toISOString().split("T")[0])}
+                    mode="date"
+                    display="default"
+                    onChange={(event, date) => {
+                      setCalendarVisible(false);
+                      if (date) {
+                        setValue("date_of_birth", date.toISOString().split("T")[0]); // Format date to YYYY-MM-DD 
+                      }
+                    }}
+                  />
+                </View>
+                  )}
 
         <View style={styles.formContainer}>
           <Controller
@@ -234,7 +224,7 @@ export default function SetupProfile() {
             )}
           />
 
-          <Text style={styles.formLabel}>Upload license certificate*</Text>
+          {/* <Text style={styles.formLabel}>Upload license certificate*</Text>
           <Pressable onPress={handlePickDocument} style={styles.uploadButton}>
             <Text style={styles.uploadButtonText}>
               {licenseFile?.assets?.[0]?.name ?? "Upload certificate"}
@@ -244,7 +234,7 @@ export default function SetupProfile() {
               size={24}
               color="#4A90E2"
             />
-          </Pressable>
+          </Pressable> */}
 
           <Controller
             control={control}
@@ -359,7 +349,7 @@ export default function SetupProfile() {
 
           <Button
             onPress={handleSubmit(onSubmit)}
-            loading={loading}
+            loading={isLoading}
           >
             <Text style={styles.submitButtonText}>SUBMIT</Text>
           </Button>
