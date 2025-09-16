@@ -178,7 +178,7 @@ export default function Appointment() {
     // if (isDoctor) return;
     return (
       <Pressable
-        // onPress={() => navigation.navigate("CreateAppointment")}
+        onPress={() => navigation.navigate("/appointment/createAppointment")}
         style={{ padding: 0 }}
       >
         <Ionicons name="add-circle-outline" size={24} color="#0B8AA0" />

@@ -1,39 +1,19 @@
-import AppLayout from "../../components/layouts/app.layout";
-import PageHeader from "../../components/ui/PageHeader";
-import { z } from "zod";
-import { ScrollView, Text, View, Pressable } from "react-native";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import TextInput from "../../components/ui/TextInput";
-
+import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
+import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { Pressable, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import AppLayout from "../../../../components/layouts/app.layout";
+import MultiSelect from "../../../../components/ui/MultiSelect";
+import PageHeader from "../../../../components/ui/PageHeader";
+import Select from "../../../../components/ui/Select";
+import TextInput from "../../../../components/ui/TextInput";
+import { APPOINTMENT_TYPE, AppointmentMode, Gender } from "../../../../types";
+import { toTitleCase } from "../../../../utils/strings";
+import { convertEnumToPickerObject } from "../../../../utils/type";
 import styles from "./styles";
-import { APPOINTMENT_TYPE, AppointmentMode, Gender } from "../../types";
-import useAuthStore from "../../store/auth";
-import { toTitleCase } from "../../utils/strings";
-import Select from "../../components/ui/Select";
-import { convertEnumToPickerObject } from "../../utils/type";
-import DateTimePicker from "../../components/ui/DateTImePicker";
-import { useMutation } from "@tanstack/react-query";
-import { createAppointment } from "../../api/services/appointment.service";
-import MultiSelect from "../../components/ui/MultiSelect";
-import { Toast } from "toastify-react-native";
 
-export const createAppointmentSchema = z.object({
-  full_name: z.string().min(1, "Full name is required"),
-  type: z
-    .nativeEnum(APPOINTMENT_TYPE)
-    .default(APPOINTMENT_TYPE.INITIAL_CONSULTATION),
-  symptoms: z.array(z.string()),
-  preferred_professional: z.string().optional(),
-  preferred_gender: z.string().optional(),
-  mode: z.nativeEnum(AppointmentMode).default(AppointmentMode.ONLINE),
-  appointmentDate: z
-    .date()
-    .min(new Date(), { message: "Date cannot be in the past" }),
-  appointmentTime: z.date(),
-});
-
-export type CreateAppointmentFormData = z.infer<typeof createAppointmentSchema>;
 
 const symptomOptions = [
   { label: "Fever", value: "fever" },
@@ -53,21 +33,54 @@ const symptomOptions = [
   { label: "Abdominal Pain", value: "abdominal_pain" },
 ];
 
+interface appointmentForm {
+  full_name: string;
+  symptoms: string[];
+  type: string;
+  preferred_professional: string;
+  preferred_gender: string;
+  mode: string;
+  appointmentDate: string;
+  appointmentTime: string;
+}
+
 export default function CreateAppointment() {
-  const { user, accessToken, refreshToken } = useAuthStore();
-  console.log(accessToken, refreshToken);
+  const isLoading = false;
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(state => state.user);
+  
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [calendarVisible, setCalendarVisible] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
+
+  const showDatePicker = () => {
+      setDatePickerVisibility(true);
+    };
+
+  const hideDatePicker = () => {
+      setDatePickerVisibility(false);
+    };
+
+  const handleConfirm = (date:string) => {
+      hideDatePicker();
+    };
+
+
+
+
   const {
     control,
     handleSubmit,
+    getValues,
+    setValue,
     reset,
     formState: { errors },
-  } = useForm<CreateAppointmentFormData>({
-    resolver: zodResolver(createAppointmentSchema),
+  } = useForm<appointmentForm>({
     defaultValues: {
       full_name: toTitleCase(user.full_name),
       type: APPOINTMENT_TYPE.INITIAL_CONSULTATION,
-      appointmentDate: new Date(),
-      appointmentTime: new Date(),
+      appointmentDate: new Date().toISOString().split("T")[0],
+      appointmentTime: new Date().toISOString().split("T")[1],
     },
   });
 
@@ -75,17 +88,8 @@ export default function CreateAppointment() {
   const genderItems = convertEnumToPickerObject(Gender);
   const modeItems = convertEnumToPickerObject(AppointmentMode);
 
-  const createAppointmentMutation = useMutation({
-    mutationFn: (data: CreateAppointmentFormData) => createAppointment(data),
-    onSuccess: (data) => {
-      console.log("Appointment booked successfully:", data);
-      Toast.success("Appointment booked successfully!");
-      reset();
-    },
-  });
 
-  console.log(errors);
-  const onSubmit = (data: CreateAppointmentFormData) => {
+  const onSubmit = (data: appointmentForm) => {
     console.log("Form data:", data);
 
     const combinedDateTime = new Date(data.appointmentDate);
@@ -97,6 +101,7 @@ export default function CreateAppointment() {
       timeDate.getSeconds()
     );
 
+
     const mutationData = {
       type: data.type,
       symptoms: data.symptoms,
@@ -106,7 +111,6 @@ export default function CreateAppointment() {
       schedule: combinedDateTime,
     };
 
-    createAppointmentMutation.mutate(mutationData);
   };
 
   return (
@@ -184,7 +188,7 @@ export default function CreateAppointment() {
               />
             </View>
 
-            <View style={styles.inputContainer}>
+            {/* <View style={styles.inputContainer}>
               <Controller
                 control={control}
                 name="appointmentDate"
@@ -199,8 +203,104 @@ export default function CreateAppointment() {
                   />
                 )}
               />
+            </View> */}
+
+             {/* Date Picker */}
+
+        <View style={{ width: '100%' }}>
+          <Text style = {{color: 'black',textAlign: 'left'}}>Select Date</Text>
+          <TouchableOpacity onPress={() => setCalendarVisible(true)}>
+            <View style={{ marginBottom: 10,marginTop:10, borderColor: '#11B3CF',
+              borderWidth:1, padding: 15, borderRadius: 15 }} >
+              <Ionicons
+                name="calendar-outline"
+                size={20}
+              />
+              <Controller
+                control={control}
+                name="appointmentDate"
+                rules={{ required: "Date is required" }}
+                render={({ field: { value } }) => (
+                  <Text>
+                    {value || "Select Date"}
+                  </Text>
+                )}
+              />
             </View>
-            <View style={styles.inputContainer}>
+          </TouchableOpacity>
+
+          {errors.appointmentDate && (
+            <Text>{errors.appointmentDate.message}</Text>
+          )}
+        </View>
+
+            {/* Date Picker Modal */}
+          {calendarVisible && (
+             <View>
+          <DateTimePicker
+            value={new Date(getValues("appointmentDate"))}
+            mode="date"
+            display="default"
+            onChange={(event, date) => {
+              setCalendarVisible(false);
+              if (date) {
+                setValue("appointmentDate", date.toISOString().split("T")[0]); // Format date to YYYY-MM-DD 
+              }
+            }}
+          />
+        </View>
+          )} 
+
+          
+        {/* Time Picker */}
+        <View style={{ width: '100%' }}>
+          <Text >Select Time</Text>
+          <TouchableOpacity onPress={() => setShowPicker(true)}>
+            <View style={{ marginBottom: 10,marginTop:10, borderColor: '#11B3CF',
+              borderWidth:1, padding: 15, borderRadius: 15 }}  >
+              <Ionicons
+                name="time-outline"
+                size={20}
+              />
+              <Controller
+                control={control}
+                name="appointmentTime"
+                rules={{ required: "Time is required" }}
+                render={({ field: { value } }) => (
+                  <Text >
+                    {value || "Select Time"}
+                  </Text>
+                )}
+              />
+            </View>
+          </TouchableOpacity>
+
+          {errors.appointmentTime && (
+            <Text>{errors.appointmentTime.message}</Text>
+          )}
+        </View>
+
+          {/* Time Picker Modal */}
+          {showPicker && (
+             <View>
+          <DateTimePicker
+            value={new Date(getValues("appointmentTime"))}
+            mode="time"
+            display="default"
+            onChange={(event, time) => {
+              setShowPicker(false);
+              if (time) {
+                // Format time to "HH:mm"
+                const formattedTime = `${time.getHours().toString().padStart(2, "0")}:${time.getMinutes().toString().padStart(2, "0")}`;
+                setValue("appointmentTime", formattedTime);
+              }
+            }}
+          />
+        </View>
+          )}
+        
+
+            {/* <View style={styles.inputContainer}>
               <Controller
                 control={control}
                 name="appointmentTime"
@@ -214,7 +314,7 @@ export default function CreateAppointment() {
                   />
                 )}
               />
-            </View>
+            </View> */}
 
             <View style={styles.inputContainer}>
               <Controller
@@ -238,7 +338,7 @@ export default function CreateAppointment() {
               // disabled={createAppointmentMutation.isPending}
             >
               <Text style={styles.button}>
-                {createAppointmentMutation.isPending
+                {isLoading
                   ? "Booking appointment..."
                   : "Book Appointment"}
               </Text>

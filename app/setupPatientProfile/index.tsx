@@ -9,7 +9,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { addAlert } from "@/integrations/features/alert/alertSlice";
 import { usePatientMutation } from "@/integrations/features/apis/apiSlice";
-import { addSinglePatient } from "@/integrations/features/patient/patientsSlice";
 import { loginUser } from "@/integrations/features/user/usersSlice";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
@@ -139,10 +138,6 @@ export default function SetupPatientProfile() {
                   logedin: true,
                   save: true,
                 })
-              ); 
-
-              dispatch(
-                addSinglePatient(res.data.patient)
               ); 
               
         

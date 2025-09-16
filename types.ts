@@ -58,14 +58,43 @@ export enum APPOINTMENT_TYPE {
   POST_OPERATIVE = "post-operative",
 }
 
+export interface Doctor{
+  id: string;
+  full_name: string;
+  email: string;
+  role: string;
+  specialization?: string;
+  license_number?: string;
+  years_of_experience?: number;
+  place_of_work?: string;
+  city_of_practice?: string;
+  state_of_practice?: string;
+  region?: string;
+  time_zone?: string;
+}
+
+export interface Patient{
+  id: string;
+  full_name: string;
+  email: string;
+  role: string;
+  occupation?: string;
+  weight?: string;
+  height?: string;
+  is_diabetic?: boolean;
+  is_asthmatic?: boolean;
+  medications?: string;
+  on_long_term_meds?: string;
+}
+
 export interface Appointment {
   id: string;
   type: APPOINTMENT_TYPE;
   symptons: string[];
   preferred_professional?: string;
   preferred_gender?: string;
-  doctor: User;
-  patient: User;
+  doctor: Doctor;
+  patient: Patient;
   patient_id: string;
   schedule: Date;
   status: APPOINTMENT_STATUS;
@@ -117,6 +146,29 @@ export const sampleAppointments = [
     status: APPOINTMENT_STATUS.COMPLETED,
     created_at: new Date("2024-06-21T11:00:00Z"),
     updated_at: new Date("2024-07-02T15:00:00Z"),
+  },
+  // ongoing
+  {
+    id: "3",
+    type: APPOINTMENT_TYPE.URGENT_CARE,
+    symptons: ["chest pain"],
+    doctor: {
+      id: "d3",
+      full_name: "Dr. Emily White",
+      email: "emily.white@hospital.com",
+      role: "doctor",
+    },
+    patient: {
+      id: "p3",
+      full_name: "Charlie Brown",
+      email: "charlie.brown@email.com",
+      role: "patient",
+    },
+    patient_id: "p3",
+    schedule: new Date("2024-07-03T09:00:00Z"),
+    status: APPOINTMENT_STATUS.ONGOING,
+    created_at: new Date("2024-06-22T10:00:00Z"),
+    updated_at: new Date("2024-06-22T10:00:00Z"),
   },
 ];
 

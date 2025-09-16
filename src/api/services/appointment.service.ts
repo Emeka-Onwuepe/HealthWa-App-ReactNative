@@ -1,4 +1,3 @@
-import { CreateAppointmentFormData } from "../../screens/CreateAppointment";
 import { APPOINTMENT_STATUS, AppointmentQuery } from "../../types";
 import apiClient from "../client";
 import { API_ENDPOINTS } from "../endpoints";

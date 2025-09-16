@@ -63,7 +63,7 @@ export default function UpcomingAppointments() {
       return (
         <AppointmentCard
           key={appointment.id || Math.random().toString()}
-          appointment={appointment}
+          appointment={ appointment }
           // navigation={navigation}
         />
       );

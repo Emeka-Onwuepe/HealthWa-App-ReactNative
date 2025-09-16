@@ -54,7 +54,7 @@ export default function ChangePassword() {
       console.log(res)
       let success = {status:200,  message: 'Password reset successfully'}
       dispatch(addAlert({...success, page: "changePasswordPage"}))
-      logoutUser()
+      dispatch(logoutUser())
       navigation.replace('/login')
 
     }else if (res.error) {

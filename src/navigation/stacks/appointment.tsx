@@ -1,8 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
+import CreateAppointment from "../../../app/(dashboard)/appointment/createAppointment";
 import Appointment from "../../screens/Appointment";
 import Calling from "../../screens/Calling";
-import CreateAppointment from "../../screens/CreateAppointment";
 import Patients from "../../screens/Patients";
 
 const AppointmentStack = createNativeStackNavigator();
