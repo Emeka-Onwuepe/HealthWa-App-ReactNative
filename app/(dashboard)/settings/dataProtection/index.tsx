@@ -71,7 +71,7 @@ export default function DataProtection() {
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionTitle}>7. User Responsibility</Text>
             <Text style={styles.sectionText}>
-              As a doctor, you play a key role in safeguarding patient data.
+              As a doctor, you play a key user_role in safeguarding patient data.
               Always log out after use, avoid sharing login credentials, and
               report suspicious activity immediately through the "Report Issue"
               feature.

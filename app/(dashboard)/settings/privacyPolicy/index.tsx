@@ -78,7 +78,7 @@ export default function PrivacyPolicy() {
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionTitle}>6. Your Responsibility</Text>
             <Text style={styles.sectionText}>
-              As a healthcare provider, you play a vital role in safeguarding
+              As a healthcare provider, you play a vital user_role in safeguarding
               patient privacy. Always log out of shared devices, use strong
               passwords, and keep your device secure.
             </Text>

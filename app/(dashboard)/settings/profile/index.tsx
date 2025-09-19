@@ -3,12 +3,12 @@ import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-  Image,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
+    Image,
+    Pressable,
+    ScrollView,
+    Text,
+    TextInput,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 // import { z } from "zod";
@@ -55,7 +55,7 @@ export default function Profile() {
 
   const avatarUrl = getAvatarUrl(user.full_name);
 
-  const isDoctor = user.role === "practitioner" ? "doctor": '';
+  const isDoctor = user.user_role === "practitioner" ? "doctor": '';
   const title = isDoctor ? "Dr. " : "";
   const imageSource = user.profile_image
     ? { uri: user.profile_image }

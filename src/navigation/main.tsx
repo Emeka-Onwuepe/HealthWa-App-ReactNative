@@ -1,16 +1,16 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Ionicons from "@expo/vector-icons/Ionicons";
 
+import CreatePrescription from "../screens/CreatePrescription";
+import PatientPrescription from "../screens/PatientPrescription";
 import Prescription from "../screens/Prescription";
 import QuickAction from "../screens/QuickAction";
 import useAuthStore from "../store/auth";
-import PatientPrescription from "../screens/PatientPrescription";
-import CreatePrescription from "../screens/CreatePrescription";
 
-import PatientStackScreen from "./stacks/patient";
-import HomeStackScreen from "./stacks/home";
 import AppointmentStackScreen from "./stacks/appointment";
+import HomeStackScreen from "./stacks/home";
+import PatientStackScreen from "./stacks/patient";
 import ProfileStackScreen from "./stacks/profile";
 
 const PrescriptionStack = createNativeStackNavigator();
@@ -55,8 +55,8 @@ const Tab = createBottomTabNavigator();
 const Main = () => {
   const { user, isAuthenticated } = useAuthStore();
   console.log("isAuthenticed", isAuthenticated);
-  const isPatient = user.role === "patient";
-  const isDoctor = user.role === "doctor";
+  const isPatient = user.user_role === "patient";
+  const isDoctor = user.user_role === "doctor";
 
   return (
     <Tab.Navigator
@@ -164,7 +164,7 @@ const Main = () => {
             initialRoute={
               user.profile_setup_completed
                 ? "Profile"
-                : user.role === "doctor"
+                : user.user_role === "doctor"
                 ? "SetupProfile"
                 : "SetupPatientProfile"
             }

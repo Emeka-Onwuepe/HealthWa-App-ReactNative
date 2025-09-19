@@ -4,7 +4,7 @@
   id: string;
   full_name: string;
   email: string;
-  role: string;
+  user_role: string;
   profile_image?: string;
   gender?: string;
   phone_number?: string;
@@ -62,7 +62,7 @@ export interface Doctor{
   id: string;
   full_name: string;
   email: string;
-  role: string;
+  user_role: string;
   specialization?: string;
   license_number?: string;
   years_of_experience?: number;
@@ -77,7 +77,7 @@ export interface Patient{
   id: string;
   full_name: string;
   email: string;
-  role: string;
+  user_role: string;
   occupation?: string;
   weight?: string;
   height?: string;
@@ -111,13 +111,13 @@ export const sampleAppointments = [
       id: "d1",
       full_name: "Dr. John Doe",
       email: "john.doe@hospital.com",
-      role: "doctor",
+      user_role: "doctor",
     },
     patient: {
       id: "p1",
       full_name: "Jane Smith",
       email: "jane.smith@email.com",
-      role: "patient",
+      user_role: "patient",
     },
     patient_id: "p1",
     schedule: new Date("2024-07-01T10:00:00Z"),
@@ -133,13 +133,13 @@ export const sampleAppointments = [
       id: "d2",
       full_name: "Dr. Alice Brown",
       email: "alice.brown@hospital.com",
-      role: "doctor",
+      user_role: "doctor",
     },
     patient: {
       id: "p2",
       full_name: "Bob Johnson",
       email: "bob.johnson@email.com",
-      role: "patient",
+      user_role: "patient",
     },
     patient_id: "p2",
     schedule: new Date("2024-07-02T14:30:00Z"),
@@ -156,13 +156,13 @@ export const sampleAppointments = [
       id: "d3",
       full_name: "Dr. Emily White",
       email: "emily.white@hospital.com",
-      role: "doctor",
+      user_role: "doctor",
     },
     patient: {
       id: "p3",
       full_name: "Charlie Brown",
       email: "charlie.brown@email.com",
-      role: "patient",
+      user_role: "patient",
     },
     patient_id: "p3",
     schedule: new Date("2024-07-03T09:00:00Z"),

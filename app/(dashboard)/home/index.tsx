@@ -1,11 +1,11 @@
 import React from "react";
 import {
-  Image,
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  Text,
-  View,
+    Image,
+    Pressable,
+    SafeAreaView,
+    ScrollView,
+    Text,
+    View,
 } from "react-native";
 // import pharma from "../../../assets/images/pharma.png";
 // import useAuthStore from "../../../src/store/auth";
@@ -23,7 +23,7 @@ export default function Home() {
     const dispatch = useAppDispatch();
     const user = useAppSelector(state => state.user);
 
-  const isDoctor = user.role === "practitioner";
+  const isDoctor = user.user_role === "practitioner";
   const title = isDoctor ? "Dr. " : "";
 
   const avatarUrl = getAvatarUrl(user.full_name);

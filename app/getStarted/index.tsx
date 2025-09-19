@@ -1,13 +1,13 @@
 import { useRouter } from "expo-router";
 import React from "react";
 import { Image, SafeAreaView, StatusBar, Text, View } from "react-native";
-import Button from "../../../components/ui/Buttonx";
+import Button from "../../components/ui/Buttonx";
 import styles from "./style";
 
 export default function GetStarted() {
   const navigation = useRouter();
-  const navigateToSignup = (role: "practitioner" | "patient") => {
-    navigation.navigate({ pathname: "./signUp", params: { role } });
+  const navigateToSignup = (user_role: "practitioner" | "patient") => {
+    navigation.navigate({ pathname: "./signUp", params: { user_role } });
   };
 
   return (
@@ -23,7 +23,7 @@ export default function GetStarted() {
           </View>
           <View style={styles.imageContainer}>
             <Image
-              source={require("../../../assets/images/join-us.png")}
+              source={require("../../assets/images/join-us.png")}
               style={styles.image}
             />
           </View>

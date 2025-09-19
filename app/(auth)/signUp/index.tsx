@@ -26,15 +26,15 @@ interface SignupFormData {
   email: string;
   password: string;
   confirm_password: string;
-  role: string;
+  user_role: string;
   terms_accepted: boolean;
 }
 
 export default function Signup() {
   const navigation = useRouter();
-  const { role } = useLocalSearchParams<{ role?: string }>();
+  const { user_role } = useLocalSearchParams<{ user_role?: string }>();
 
-  console.log("Role from params:", role);
+  console.log("user_role from params:", user_role);
 
   const [registerUser, { isLoading: loading }] = useRegisterUserMutation();
 
@@ -85,7 +85,7 @@ export default function Signup() {
       email: "",
       password: "",
       confirm_password: "",
-      role: role || "patient",
+      user_role: user_role || "patient",
       terms_accepted: false,
     },
   });
@@ -100,10 +100,10 @@ export default function Signup() {
         email: formdata.email,
         phone_number: formdata.phone_number,
         password: formdata.password,
-        role: formdata.role,
+        user_role: formdata.user_role,
         full_name: formdata.full_name,
       };
-
+      console.log(data)
       let res = await registerUser(data);
       console.log(res)
       if (res.data) {

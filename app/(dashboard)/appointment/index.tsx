@@ -1,11 +1,11 @@
 import React, { useCallback, useState } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  ListRenderItem,
-  Pressable,
-  Text,
-  View,
+    ActivityIndicator,
+    FlatList,
+    ListRenderItem,
+    Pressable,
+    Text,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 // import { useInfiniteQuery } from "@tanstack/react-query";
@@ -15,8 +15,8 @@ import PageHeader from "../../../components/ui/PageHeader";
 // import useAuthStore from "../../store/auth";
 
 import {
-  Appointment as AppointmentType,
-  sampleAppointments
+    Appointment as AppointmentType,
+    sampleAppointments
 } from "../../../types";
 // import { fetchAppointments } from "../../api/services/appointment.service";
 import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
@@ -38,7 +38,7 @@ export default function Appointment() {
 
   // const { user } = useAuthStore();
 
-  const isDoctor = user.role === "practitioner";
+  const isDoctor = user.user_role === "practitioner";
   const isLoading = false
   const isError = false
 

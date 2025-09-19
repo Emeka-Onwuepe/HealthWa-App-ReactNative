@@ -21,7 +21,7 @@ export default function Settings() {
   const [logout,{isLoading}] = useLogoutMutation()
 
   const avatarUrl = getAvatarUrl(user.full_name);
-  const isDoctor = user.role === "practitioner";
+  const isDoctor = user.user_role === "practitioner";
 
   const imageSource = user.profile_image
     ? { uri: user.profile_image }

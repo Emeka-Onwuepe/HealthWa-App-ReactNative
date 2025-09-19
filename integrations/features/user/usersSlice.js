@@ -3,7 +3,7 @@ import { readFromAsyncStorage, writeToAsyncStorage } from '../../async_store';
 
 // const initialData = {
 //   id: 0, full_name: "", email: "",
-//   role: "", phone_number: '',
+//   user_role: "", phone_number: '',
 //   specialization: '', verified_phone_number: false, 
 //   verified_email: false, usertoken: "",
 //   profile_image: "", gender: "",
@@ -20,7 +20,7 @@ const initialData = {
   id: 0,
   full_name: "",
   email: "",
-  role: "",
+  user_role: "",
   profile_image: "",
   gender: "",
   phone_number: "",

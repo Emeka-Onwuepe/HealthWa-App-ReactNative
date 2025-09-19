@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-  ActivityIndicator,
-  Pressable,
-  SafeAreaView,
-  Text,
-  TextInput,
-  View,
+    ActivityIndicator,
+    Pressable,
+    SafeAreaView,
+    Text,
+    TextInput,
+    View,
 } from "react-native";
 // import { z } from "zod";
 import { useRouter } from "expo-router";
@@ -43,7 +43,7 @@ export default function Verification() {
 
   useEffect(() => {
     if (user.verified_email) {
-       if(user.role == 'practitioner') {
+       if(user.user_role == 'practitioner') {
           navigation.navigate("/setupProfile");
         } else {
           navigation.navigate("/setupPatientProfile");
@@ -119,7 +119,7 @@ export default function Verification() {
           })
         );
         dispatch(verify('verified_email'));
-         if(user.role == 'practitioner') {
+         if(user.user_role == 'practitioner') {
           navigation.navigate("/setupProfile");
         } else {
           navigation.navigate("/setupPatientProfile");

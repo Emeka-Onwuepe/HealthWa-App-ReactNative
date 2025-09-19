@@ -48,7 +48,7 @@ export default function Login() {
         navigation.replace("/OTPVerification");
       } else if(user.gender == 'other') {
 
-         if(user.role == 'practitioner') {
+         if(user.user_role == 'practitioner') {
           navigation.navigate("/setupProfile");
         } else {
           navigation.navigate("/setupPatientProfile");
@@ -93,7 +93,7 @@ export default function Login() {
         navigation.replace("/OTPVerification");
         } else if(res.data.user.gender == 'other') {
 
-         if(res.data.user.role == 'practitioner') {
+         if(res.data.user.user_role == 'practitioner') {
           navigation.navigate("/setupProfile");
         } else {
           navigation.navigate("/setupPatientProfile");
