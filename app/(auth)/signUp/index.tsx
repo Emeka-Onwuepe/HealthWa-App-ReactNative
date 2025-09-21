@@ -15,6 +15,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 
 import { addAlert } from "@/integrations/features/alert/alertSlice";
 import { useRegisterUserMutation } from "@/integrations/features/apis/apiSlice";
+import { userRegistered } from "@/integrations/features/user/boardedUserSlice";
 import { loginUser } from "@/integrations/features/user/usersSlice";
 import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
 import Checkbox from "../../../components/ui/Checkbox";
@@ -115,7 +116,7 @@ export default function Signup() {
             save: true,
           })
         );
-        // dispatch(userRegistered());
+        dispatch(userRegistered());
         navigation.navigate("/OTPVerification");
       } else if (res.error) {
         dispatch(addAlert({ ...res.error, page: "signup" }));

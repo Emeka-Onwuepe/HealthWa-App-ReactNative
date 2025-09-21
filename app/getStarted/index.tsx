@@ -1,3 +1,5 @@
+import { boardUser } from "@/integrations/features/user/boardedUserSlice";
+import { useAppDispatch } from "@/integrations/hooks";
 import { useRouter } from "expo-router";
 import React from "react";
 import { Image, SafeAreaView, StatusBar, Text, View } from "react-native";
@@ -6,7 +8,9 @@ import styles from "./style";
 
 export default function GetStarted() {
   const navigation = useRouter();
+  const dispatch = useAppDispatch()
   const navigateToSignup = (user_role: "practitioner" | "patient") => {
+    dispatch(boardUser())
     navigation.navigate({ pathname: "./signUp", params: { user_role } });
   };
 

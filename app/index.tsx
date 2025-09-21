@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, View } from "react-native";
 // import logo from "../../../assets/images/logo.png";
+import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
 import { useRouter } from "expo-router";
 import Styles from "../styles/splashStyles";
 
@@ -8,12 +9,40 @@ import Styles from "../styles/splashStyles";
 export default function SplashScreen() {
   console.log("SplashScreen rendered");
   const navigation = useRouter();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(state => state.user);
+  const board = useAppSelector(state => state.board);
+  const [timout,setTimeOut] = useState(false)
+    
+    useEffect(() => {
+      console.log('board state:', board);
+      if (user.logedin && timout) {
+        if (user.verified_email  && user.gender != 'other') {
+          navigation.replace("/home");
+        } else if (!user.verified_email){
+          navigation.replace("/OTPVerification");
+        } else if(user.gender == 'other') {
+  
+           if(user.user_role == 'practitioner') {
+            navigation.navigate("/setupProfile");
+          } else {
+            navigation.navigate("/setupPatientProfile");
+          }
+        }
+      }else if(timout){
+        if(board.registered){
+          navigation.replace('/login')
+        }else if(board.boarded){
+          navigation.replace('/signUp')
+        }else{
+          navigation.replace('/getStarted')
+        }
+      }
+    }, [timout]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      console.log('navigate')
-      navigation.replace("./getStarted");
-
+      setTimeOut(true)
     }, 7000);
     return () => clearTimeout(timer);
   }, []);
