@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet } from "react-native";
-import RNPickerSelect, { PickerStyle } from "react-native-picker-select";
+import { StyleSheet, Text, View } from "react-native";
+import RNPickerSelect from "react-native-picker-select";
 import { fontFamily } from "../../constants/typography";
 
 interface SelectProps {
@@ -7,6 +7,7 @@ interface SelectProps {
   labelStyle?: any;
   data: { label: string; value: string | number }[];
   onValueChange: (value: string) => void;
+  error?: string;
 }
 
 export default function Select({
@@ -14,6 +15,7 @@ export default function Select({
   labelStyle,
   data,
   onValueChange,
+  error,
 }: SelectProps) {
   return (
     <View style={styles.container}>
@@ -23,6 +25,7 @@ export default function Select({
         items={data}
         style={pickerSelectStyles}
       />
+      {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
 }

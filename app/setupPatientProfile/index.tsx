@@ -1,11 +1,17 @@
 import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
 import { useRouter } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
-import { SafeAreaView, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { RadioGroup } from "react-native-radio-buttons-group";
 import Button from "../../components/ui/Button";
 // import DateTimePicker from "../../components/ui/DateTImePicker";
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 import { addAlert } from "@/integrations/features/alert/alertSlice";
 import { usePatientMutation } from "@/integrations/features/apis/apiSlice";
@@ -56,7 +62,6 @@ const yesNoOptions = [
   },
 ];
 
-
 type FormData = {
   date_of_birth?: Date | string;
   gender: string;
@@ -72,13 +77,12 @@ type FormData = {
 
 export default function SetupPatientProfile() {
   // const { user, setUser } = useAuthStore();
-    const navigation = useRouter();
-    const dispatch = useAppDispatch();
-    const user = useAppSelector(state => state.user);
-    const [calendarVisible, setCalendarVisible] = useState(false);
-    const [patient, { isLoading }] = usePatientMutation();
-    const [loading,setLoading] = useState(true)
-    
+  const navigation = useRouter();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
+  const [calendarVisible, setCalendarVisible] = useState(false);
+  const [patient, { isLoading }] = usePatientMutation();
+  const [loading, setLoading] = useState(true);
 
   const {
     control,
@@ -97,68 +101,88 @@ export default function SetupPatientProfile() {
       medications: "",
       on_long_term_meds: false,
       date_of_birth: new Date().toISOString().split("T")[0],
-
     },
+    mode: "onSubmit",
+    reValidateMode: "onChange",
+    shouldFocusError: true,
   });
 
-    useEffect(() => {
-      if (user.logedin && !loading  && !isLoading) {
-        if (user.verified_email  && user.gender != 'other') {
-          navigation.replace("/home");
-        } else if (!user.verified_email){
-          navigation.replace("/OTPVerification");
-        }
+  useEffect(() => {
+    if (user.logedin && !loading && !isLoading) {
+      if (user.verified_email && user.gender != "other") {
+        navigation.replace("/home");
+      } else if (!user.verified_email) {
+        navigation.replace("/OTPVerification");
       }
-    }, [loading,user]);
-  
-  
-    useEffect(() => {
-        if (user && loading) {
-          setLoading(false);
-        }
-      }, [user]);
+    }
+  }, [loading, user]);
 
- 
-  const onSubmit = async (data:FormData) => {
+  useEffect(() => {
+    if (user && loading) {
+      setLoading(false);
+    }
+  }, [user]);
+
+  const onSubmit = async (data: FormData) => {
     const data_ = {
       action: "create",
-      usertoken:user.usertoken,
+      usertoken: user.usertoken,
       data: {
-      ...data,
-      user_id: user.id,
-       }
+        ...data,
+        user_id: user.id,
+      },
+    };
+    console.log(data_);
+    try {
+      const res = await patient(data_);
+      // Log full response for debugging parsing issues
+      console.debug("patient mutation result", res);
+
+      if (res.data) {
+        dispatch(
+          loginUser({
+            ...res.data.user,
+            logedin: true,
+            save: true,
+          })
+        );
+
+        if (res.data.user.gender != "other") {
+          navigation.replace("/home");
         }
-         console.log(data_)
-        let res = await patient(data_);
-       
-         if (res.data) {
-              dispatch(
-                loginUser({
-                  ...res.data.user,
-                  logedin: true,
-                  save: true,
-                })
-              ); 
-              
-        
-              if(res.data.user.gender != 'other') {
-                navigation.replace("/home");
-              }
-        
-        
-        
-            } else if (res.error) {
-              dispatch(addAlert({ ...res.error, page: "patientSetupPage" }));
-            }
-
-
-
+      } else if (res.error) {
+        // Normalize common RTK Query error shapes into the format expected by get_message_and_code
+        // Cast to any so TypeScript won't complain about union properties
+        const rerr: any = res.error;
+        const normalized: any = {
+          status: rerr?.status ?? rerr?.originalStatus ?? "PARSING_ERROR",
+          data: rerr?.data ?? rerr?.originalError ?? {},
+          message: rerr?.error ?? rerr?.message ?? "An error occurred",
+          page: "patientSetupPage",
+        };
+        console.warn("patient mutation error", rerr, normalized);
+        dispatch(addAlert(normalized));
+      }
+    } catch (err) {
+      // Catch unexpected exceptions (e.g., network stack throws)
+      console.error("Unexpected error in patient mutation", err);
+      const e: any = err;
+      const normalized: any = {
+        status: e?.status ?? "FETCH_ERROR",
+        data: e?.data ?? {},
+        message: e?.message ?? "Network or parsing error",
+        page: "patientSetupPage",
       };
-
+      dispatch(addAlert(normalized));
+    }
+  };
 
   return (
     <SafeAreaView style={[styles.container, { flex: 1 }]}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
         <PageHeader title="Patient Profile Setup" />
 
         <View style={styles.headerContainer}>
@@ -186,46 +210,68 @@ export default function SetupPatientProfile() {
 
         <View style={{ marginTop: 10, marginBottom: 20 }}>
           <Text style={styles.label}>Date of Birth</Text>
-          <TouchableOpacity onPress={() => setCalendarVisible(true)} 
-          style={{ borderColor: "#11B3CF", borderWidth: 1, borderRadius: 50, 
-                  marginTop: 10}}>
-            <View style={[{ flexDirection: "row", alignItems: "center", padding: 10, marginLeft: 10 }]}>
+          <TouchableOpacity
+            onPress={() => setCalendarVisible(true)}
+            style={{
+              borderColor: "#11B3CF",
+              borderWidth: 1,
+              borderRadius: 50,
+              marginTop: 10,
+            }}
+          >
+            <View
+              style={[
+                {
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 10,
+                  marginLeft: 10,
+                },
+              ]}
+            >
               <Ionicons
-              name="calendar-outline"
-              size={20}
-              style={{ marginRight: 8 }}
+                name="calendar-outline"
+                size={20}
+                style={{ marginRight: 8 }}
               />
               <Controller
-              control={control}
-              name="date_of_birth"
-              render={({ field: { value } }) => (
-                <Text>
-                {value ? (typeof value === "string" ? value : value.toISOString().split("T")[0]) : ""}
-                </Text>
-              )}
+                control={control}
+                name="date_of_birth"
+                render={({ field: { value } }) => (
+                  <Text>
+                    {value
+                      ? typeof value === "string"
+                        ? value
+                        : value.toISOString().split("T")[0]
+                      : ""}
+                  </Text>
+                )}
               />
             </View>
           </TouchableOpacity>
         </View>
 
         {/* Date Picker Modal */}
-          {calendarVisible && (
-             <View>
-          <DateTimePicker
-            value={new Date(getValues("date_of_birth") ?? new Date().toISOString().split("T")[0])}
-            mode="date"
-            display="default"
-            onChange={(event, date) => {
-              setCalendarVisible(false);
-              if (date) {
-                setValue("date_of_birth", date.toISOString().split("T")[0]); // Format date to YYYY-MM-DD 
+        {calendarVisible && (
+          <View>
+            <DateTimePicker
+              value={
+                new Date(
+                  getValues("date_of_birth") ??
+                    new Date().toISOString().split("T")[0]
+                )
               }
-            }}
-          />
-        </View>
-          )}
-
-
+              mode="date"
+              display="default"
+              onChange={(event, date) => {
+                setCalendarVisible(false);
+                if (date) {
+                  setValue("date_of_birth", date.toISOString().split("T")[0]); // Format date to YYYY-MM-DD
+                }
+              }}
+            />
+          </View>
+        )}
 
         <View>
           {/* <Controller
@@ -245,7 +291,7 @@ export default function SetupPatientProfile() {
             )}
           /> */}
 
-              {/* <Controller
+          {/* <Controller
                 control={control}
                 name="date_of_birth"
                 render={({ field: { value } }) => (
@@ -256,12 +302,14 @@ export default function SetupPatientProfile() {
           <Controller
             control={control}
             name="gender"
+            rules={{ required: "Please select your gender" }}
             render={({ field: { onChange, value } }) => (
               <SelectInput
                 label="Gender"
                 data={genderItems}
                 onValueChange={onChange}
                 labelStyle={styles.inputLabel}
+                error={errors.gender?.message}
               />
             )}
           />
@@ -282,6 +330,7 @@ export default function SetupPatientProfile() {
           <Controller
             control={control}
             name="height"
+            rules={{ required: "Height is required" }}
             render={({ field: { onChange, value } }) => (
               <TextInput
                 label="Height"
@@ -298,6 +347,7 @@ export default function SetupPatientProfile() {
           <Controller
             control={control}
             name="weight"
+            rules={{ required: "Weight is required" }}
             render={({ field: { onChange, value } }) => (
               <TextInput
                 label="Weight"
@@ -305,7 +355,7 @@ export default function SetupPatientProfile() {
                 value={value ?? ""}
                 onChangeText={onChange}
                 keyboardType="numeric"
-                error={errors.height?.message}
+                error={errors.weight?.message}
                 labelStyle={styles.inputLabel}
               />
             )}
@@ -314,13 +364,14 @@ export default function SetupPatientProfile() {
           <Controller
             control={control}
             name="occupation"
+            rules={{ required: "Occupation is required" }}
             render={({ field: { onChange, value } }) => (
               <TextInput
                 label="Occupation"
                 placeholder="Occupation"
                 value={value ?? ""}
                 onChangeText={onChange}
-                error={errors.height?.message}
+                error={errors.occupation?.message}
                 labelStyle={styles.inputLabel}
               />
             )}
@@ -390,7 +441,7 @@ export default function SetupPatientProfile() {
                 placeholder="If yes, kindly list..."
                 value={value ?? ""}
                 onChangeText={onChange}
-                error={errors.height?.message}
+                error={errors.medications?.message}
                 labelStyle={styles.inputLabel}
               />
             )}
