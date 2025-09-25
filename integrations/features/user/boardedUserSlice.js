@@ -39,10 +39,15 @@ export const boardUserSlice = createSlice({
     },
     setCanSearch: (state) =>{
       state.canSearch = !state.canSearch
-    }
+    },
+    loadData: (state, action) => {
+      state.boarded = action.payload.boarded
+      state.registered = action.payload.registered
+      state.navigate = true
+    },
   },
 });
 
-export const { boardUser,userRegistered,loadData,addOld,clearOld,setCanSearch } = boardUserSlice.actions;
+export const { boardUser,userRegistered,loadData,setCanSearch } = boardUserSlice.actions;
 
 export default boardUserSlice.reducer;
