@@ -62,19 +62,19 @@ export default function DataProtection() {
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionTitle}>6. Confidential Messaging</Text>
             <Text style={styles.sectionText}>
-              The "Patient Chat" feature uses end-to-end encryption, ensuring
-              that all communications between you and your patients remain
-              private and tamper-proof.
+              The &quot;Patient Chat&quot; feature uses end-to-end encryption,
+              ensuring that all communications between you and your patients
+              remain private and tamper-proof.
             </Text>
           </View>
 
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionTitle}>7. User Responsibility</Text>
             <Text style={styles.sectionText}>
-              As a doctor, you play a key user_role in safeguarding patient data.
-              Always log out after use, avoid sharing login credentials, and
-              report suspicious activity immediately through the "Report Issue"
-              feature.
+              As a doctor, you play a key user_role in safeguarding patient
+              data. Always log out after use, avoid sharing login credentials,
+              and report suspicious activity immediately through the
+              &quot;Report Issue&quot; feature.
             </Text>
           </View>
 
@@ -83,7 +83,7 @@ export default function DataProtection() {
             <Text style={styles.sectionText}>
               Patients must provide consent before their data is shared or
               accessed. You can view and manage consent preferences under the
-              "Patient Profile" section.
+              &quot;Patient Profile&quot; section.
             </Text>
           </View>
 
@@ -91,8 +91,8 @@ export default function DataProtection() {
             <Text style={styles.sectionTitle}>9. Anonymous Reporting</Text>
             <Text style={styles.sectionText}>
               If you suspect a breach or have concerns about data security, use
-              the "Anonymous Reporting Tool" in the app to notify our security
-              team discreetly.
+              the &quot;Anonymous Reporting Tool&quot; in the app to notify our
+              security team discreetly.
             </Text>
           </View>
 
@@ -100,7 +100,7 @@ export default function DataProtection() {
             <Text style={styles.footerText}>
               Your trust is our priority. With HealthWa, you can focus on
               delivering exceptional care while we handle the security of your
-              patients' data.
+              patients&apos; data.
             </Text>
             <Text style={styles.footerText}>
               For further assistance, contact our Data Security Team via the
