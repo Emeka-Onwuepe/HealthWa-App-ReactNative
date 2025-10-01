@@ -5,19 +5,17 @@ import React from "react";
 import { Provider } from "react-redux";
 import ToastManager from "toastify-react-native";
 
-
 export default function RootLayout() {
   return (
     <Provider store={store}>
-        <ToastManager textStyle={{ fontSize: 16, width: "100%" }} />
+      <ToastManager textStyle={{ fontSize: 16, width: "100%" }} />
 
-        <Stack
-         screenOptions={{
+      <Stack
+        screenOptions={{
           headerShown: false,
-        }}>
-        </Stack>
-        <Alert_System />
-       
+        }}
+      ></Stack>
+      <Alert_System />
     </Provider>
   );
 }

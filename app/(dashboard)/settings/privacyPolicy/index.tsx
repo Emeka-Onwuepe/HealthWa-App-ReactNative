@@ -58,8 +58,8 @@ export default function PrivacyPolicy() {
               canceling appointments to avoid confusion.
             </Text>
             <Text style={styles.sectionText}>
-              Patients' consent is required before sharing any health-related
-              updates or documents.
+              Patients&apos; consent is required before sharing any
+              health-related updates or documents.
             </Text>
           </View>
 
@@ -78,9 +78,9 @@ export default function PrivacyPolicy() {
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionTitle}>6. Your Responsibility</Text>
             <Text style={styles.sectionText}>
-              As a healthcare provider, you play a vital user_role in safeguarding
-              patient privacy. Always log out of shared devices, use strong
-              passwords, and keep your device secure.
+              As a healthcare provider, you play a vital user_role in
+              safeguarding patient privacy. Always log out of shared devices,
+              use strong passwords, and keep your device secure.
             </Text>
             <Text style={styles.sectionText}>
               By using HealthWa, you agree to uphold these privacy standards and

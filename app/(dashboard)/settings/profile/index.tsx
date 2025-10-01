@@ -3,12 +3,12 @@ import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-    Image,
-    Pressable,
-    ScrollView,
-    Text,
-    TextInput,
-    View,
+  Image,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 // import { z } from "zod";
@@ -47,15 +47,15 @@ export default function Profile() {
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false); // State to toggle between view and edit mode
 
-    const navigation = useRouter();
-    const dispatch = useAppDispatch();
-    const user = useAppSelector(state => state.user);
+  const navigation = useRouter();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
 
   // const { user, setUser } = useAuthStore();
 
   const avatarUrl = getAvatarUrl(user.full_name);
 
-  const isDoctor = user.user_role === "practitioner" ? "doctor": '';
+  const isDoctor = user.user_role === "practitioner" ? "doctor" : "";
   const title = isDoctor ? "Dr. " : "";
   const imageSource = user.profile_image
     ? { uri: user.profile_image }
@@ -97,17 +97,14 @@ export default function Profile() {
 
   const handleImageUpload = async (uri: string) => {
     // const formData = new FormData();
-
     // const filename = uri.split("/").pop();
     // const match = /\.(\w+)$/.exec(filename);
     // const type = match ? `image/${match[1]}` : `image`;
-
     // formData.append("file", {
     //   uri,
     //   name: filename,
     //   type,
     // } as unknown as Blob);
-
     // try {
     //   const res = await uploadProfileImage(formData);
     //   console.log(res);
@@ -119,12 +116,9 @@ export default function Profile() {
   const handleUpdateProfile = async (data: FormData) => {
     // try {
     //   const res = await updateProfile(data);
-
     //   Toast.success("Your profile information has been updated");
-
     //   // Update user data
     //   // setUser(res.data);
-
     //   reset({
     //     email: res.data.email,
     //     phone_number: res.data.phone_number,
@@ -134,7 +128,6 @@ export default function Profile() {
     //     about_me: res.data.about_me ?? "",
     //     license_number: res.data.license_number ?? "",
     //   });
-
     //   setIsEditing(false); // Switch back to view mode
     // } catch (error) {
     //   console.error(error);
@@ -144,7 +137,9 @@ export default function Profile() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <PageHeader title="Profile" />
+        <Text>
+          <PageHeader title="Profile" />
+        </Text>
         <View style={styles.profileContainer}>
           <Pressable onPress={handlePickImage} style={styles.profileEdit}>
             <Image source={imageSource} style={styles.profileImage} />
