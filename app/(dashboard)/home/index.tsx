@@ -1,16 +1,18 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
-    Image,
-    Pressable,
-    SafeAreaView,
-    ScrollView,
-    Text,
-    View,
+  Image,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  View,
 } from "react-native";
+import socketConnection_ from "../../socket";
 // import pharma from "../../../assets/images/pharma.png";
 // import useAuthStore from "../../../src/store/auth";
 import Activities from "@/components/Actvities";
 import UpcomingAppointments from "@/components/UpcomingAppointments";
+import { connectSocket, disconnectSocket } from "@/integrations/features/socket/socketSlice";
 import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
 import { useRouter } from "expo-router";
 import PageHeader from "../../../components/ui/PageHeader";
@@ -22,11 +24,93 @@ export default function Home() {
     const navigation = useRouter();
     const dispatch = useAppDispatch();
     const user = useAppSelector(state => state.user);
+    const socketState = useAppSelector(state => state.socket);
+    const [connect,setConnect] = useState(false)
+    
+  //   useEffect(() => {
+
+  //    const socket = io(baseUrl);
+  //       console.log("Socket Initialized");
+  //       socket.on("connect", () => {
+  //       console.log(socket.connected); // true
+  //       console.log(socket);
+  //       });
+    
+  //       socket.on("disconnect", () => {
+  //       console.log(socket.connected); // false
+  //       });
+
+  // }, []);
+
+
 
   const isDoctor = user.user_role === "practitioner";
   const title = isDoctor ? "Dr. " : "";
 
   const avatarUrl = getAvatarUrl(user.full_name);
+  let socketConnection: ReturnType<typeof socketConnection_>;
+  // useEffect(()=>{
+  //   if(socketConnection.connected){
+  //     dispatch(connectSocket())
+  //   }else{
+  //     dispatch(disconnectSocket())
+  //   }
+  // },[])
+  
+useEffect(()=>{
+  socketConnection = socketConnection_(user.usertoken)
+
+  socketConnection.on("connect", () => {
+      console.log("Socket ID from con:", socketConnection.id);
+      dispatch(connectSocket())
+    });
+
+    socketConnection.on("disconnect", () => {
+      console.log('disconnected')
+      dispatch(disconnectSocket())
+     });
+
+     socketConnection.on("reconnect", () => {
+      console.log('reconnecting')
+      
+     });
+    //  dispatch(disconnectSocket())
+
+},[])
+
+
+  useEffect(() => {
+    console.log(socketState)
+    if(user.logedin){
+        if(!socketState.connected){
+          console.log('try toconnect socket')
+            socketConnection = socketConnection_(user.usertoken)
+
+          // connect to socket server
+          // console.log('inside if')
+            // socketConnection.connect();
+            // socketConnection.emit("authenticate", { token: user.usertoken });
+        }else{
+          // send token to server
+          
+          // socketConnection.emit("authenticate", { token: user.usertoken });
+        }
+    }
+
+    // if(socketConnection){
+
+    //   socketConnection.on("connect", () => {
+    //   console.log("Socket ID from con:", socketConnection.id);
+    //   dispatch(connectSocket())
+    // });
+    // socketConnection.on("disconnect", () => {
+    //   console.log('disconnected')
+    //   dispatch(disconnectSocket())
+    // });
+
+    // }
+
+  }, [user, socketState]);
 
   const ProfileButton = () => {
     const imageSource = user.profile_image

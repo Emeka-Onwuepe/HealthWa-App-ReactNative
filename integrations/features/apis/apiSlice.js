@@ -1,8 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 // Define a service using a base URL and expected endpoints
-// export const baseUrl = 'http://localhost:5000/api'
-export const baseUrl = 'https://health-wa-git-main-emeka-s-projects-2df9bd2a.vercel.app/api'
+// export const base_url = 'https://health-wa-git-main-emeka-s-projects-2df9bd2a.vercel.app'
+// export const base_url = 'http://localhost:5000'
+export const base_url = "https://1277457fe222.ngrok-free.app"
+export const baseUrl = `${base_url}/api`
+// export const baseUrl = 'https://health-wa-git-main-emeka-s-projects-2df9bd2a.vercel.app/api'
 
 export const mediAppApi = createApi({
   reducerPath: 'mediAppApi',
@@ -11,7 +14,7 @@ export const mediAppApi = createApi({
           if (!headers.get("Content-Type")) {
             headers.set("Content-Type", "application/json")
         }
-        headers.set("x-vercel-protection-bypass", "N4v38tw1rJLlXWA82X4JEFwfitPtOHcW")
+        // headers.set("x-vercel-protection-bypass", "N4v38tw1rJLlXWA82X4JEFwfitPtOHcW")
 
         
         return headers

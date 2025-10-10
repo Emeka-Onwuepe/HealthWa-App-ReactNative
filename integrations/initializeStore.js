@@ -1,5 +1,6 @@
 import { addAppointments, get_initial_appointments_data } from './features/appointment/appointmentsSlice';
 import { addPatients, get_initial_patients_data } from './features/patient/patientsSlice';
+import { get_initial_socket_data, loadSocketData } from './features/socket/socketSlice';
 import { get_initial_board_data, loadData } from './features/user/boardedUserSlice';
 import { get_initial_user_data, loginUser } from './features/user/usersSlice';
 
@@ -16,6 +17,8 @@ const initializeStore = async (store) => {
 
   const board = await get_initial_board_data()
   store.dispatch(loadData({...board}))
+  const socket = await get_initial_socket_data()
+  store.dispatch(loadSocketData({...socket}))
 };
 
 export default initializeStore;

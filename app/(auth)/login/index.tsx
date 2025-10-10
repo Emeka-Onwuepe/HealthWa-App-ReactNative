@@ -102,6 +102,7 @@ export default function Login() {
 
 
     } else if (res.error) {
+      console.log(res.error);
       dispatch(addAlert({ ...res.error, page: "login" }));
     }
   };

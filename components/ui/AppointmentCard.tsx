@@ -16,7 +16,8 @@ export default function AppointmentCard({appointment}: {appointment: Appointment
     : "N/A";
   const tokenNumber = "-";
   const status = appointment.status || "Pending";
-  const profileImageUrl = appointment.patient?.profile_image;
+  // const profileImageUrl = appointment.patient?.profile_image;
+  const profileImageUrl = null;
 
   // states
   const [loading, setLoading] = useState(false);
@@ -110,7 +111,7 @@ export default function AppointmentCard({appointment}: {appointment: Appointment
             // onPress={() => navigation.navigate("Call")}
           >
             <Ionicons name="videocam" size={20} color="#0B8AA0" />
-            <Text style={styles.callText}>Join Call</Text>
+            <Text style={styles.callText}>Join Call ----</Text>
           </Pressable>
         )}
       </View>

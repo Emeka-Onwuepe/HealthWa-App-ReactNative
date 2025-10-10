@@ -100,7 +100,7 @@ export default function SetupProfile() {
                   addPatients({data:res.data.patient,save:true,})
                 ); 
                 
-          
+                console.log(res.data.user)
                 if(res.data.user.gender != 'other') {
                   navigation.replace("/home");
                 }

@@ -7,7 +7,6 @@ import Styles from "../styles/splashStyles";
 
 
 export default function SplashScreen() {
-  console.log("SplashScreen rendered");
   const navigation = useRouter();
   const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.user);
