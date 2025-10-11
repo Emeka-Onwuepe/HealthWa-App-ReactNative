@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Appointment } from "../../types";
@@ -9,6 +10,7 @@ import { getTwelveHourFormat } from "../../utils/date";
 
 
 export default function AppointmentCard({appointment}: {appointment: Appointment}) {
+  const navigation = useRouter()
   const patientName = appointment.patient?.full_name || "N/A";
   const consultationType = appointment.type || "Consultation";
   const consultationTime = appointment.schedule
@@ -108,10 +110,10 @@ export default function AppointmentCard({appointment}: {appointment: Appointment
         {status.toLowerCase() === "ongoing" && (
           <Pressable
             style={styles.callButton}
-            // onPress={() => navigation.navigate("Call")}
+            onPress={() => navigation.navigate("/videoCall")}
           >
             <Ionicons name="videocam" size={20} color="#0B8AA0" />
-            <Text style={styles.callText}>Join Call ----</Text>
+            <Text style={styles.callText}>Join Call </Text>
           </Pressable>
         )}
       </View>

@@ -15,7 +15,7 @@ const VideoCall = () => {
             setLocalStream(stream);
             // In a real app, signaling would be used to exchange streams
             // For demo, we simulate remote stream as local stream
-            setRemoteStream(stream);
+            // setRemoteStream(stream);
         });
     }, []);
 
@@ -42,12 +42,31 @@ const VideoCall = () => {
     );
 };
 
+
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#222', justifyContent: 'center', alignItems: 'center' },
-    header: { color: '#fff', fontSize: 20, marginBottom: 20 },
-    videoContainer: { flexDirection: 'row', width: '100%', justifyContent: 'space-around' },
-    localVideo: { width: 160, height: 240, backgroundColor: '#444', borderRadius: 8 },
-    remoteVideo: { width: 160, height: 240, backgroundColor: '#444', borderRadius: 8 },
+    container: { flex: 1, backgroundColor: '#222' },
+    header: { color: '#fff', fontSize: 20, marginBottom: 20, alignSelf: 'center' },
+    videoContainer: { flex: 1 },
+    localVideo: {
+        position: 'absolute',
+        top: 20,
+        left: 20,
+        width: '40%',
+        height: '30%',
+        backgroundColor: '#444',
+        borderRadius: 8,
+        zIndex: 2,
+        borderWidth: 2,
+        borderColor: '#fff',
+    },
+    remoteVideo: {
+        flex: 1,
+        width: '100%',
+        height: '85%',
+        backgroundColor: '#444',
+        borderRadius: 0,
+        zIndex: 1,
+    },
 });
 
 export default VideoCall;
