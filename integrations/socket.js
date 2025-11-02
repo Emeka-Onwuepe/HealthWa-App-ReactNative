@@ -1,5 +1,3 @@
-import { base_url } from "@/integrations/features/apis/apiSlice";
-import { io } from "socket.io-client";
 
 
 // const socket = io(baseUrl);
@@ -13,16 +11,16 @@ import { io } from "socket.io-client";
 // get data from user
 
 
-const socketConnection_ = (token)  =>{
-    const connection = io(base_url,{
-reconnectionDelayMax: 10000,
-  auth: {
-    token
-  }
-});
+// const socketConnection_ = (token)  =>{
+//     const connection = io(base_url,{
+// reconnectionDelayMax: 10000,
+//   auth: {
+//     token
+//   }
+// });
 
-return connection
-}
+// return connection
+// }
 
 
 
@@ -38,4 +36,4 @@ return connection
 
 // }
 
-export default socketConnection_;
+// export default socketConnection_;

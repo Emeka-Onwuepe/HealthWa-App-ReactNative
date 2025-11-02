@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Image,
   Pressable,
@@ -7,12 +7,10 @@ import {
   Text,
   View,
 } from "react-native";
-import socketConnection_ from "../../socket";
 // import pharma from "../../../assets/images/pharma.png";
 // import useAuthStore from "../../../src/store/auth";
 import Activities from "@/components/Actvities";
 import UpcomingAppointments from "@/components/UpcomingAppointments";
-import { connectSocket, disconnectSocket } from "@/integrations/features/socket/socketSlice";
 import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
 import { useRouter } from "expo-router";
 import PageHeader from "../../../components/ui/PageHeader";
@@ -48,69 +46,68 @@ export default function Home() {
   const title = isDoctor ? "Dr. " : "";
 
   const avatarUrl = getAvatarUrl(user.full_name);
-  let socketConnection: ReturnType<typeof socketConnection_>;
+  // let socketConnection: ReturnType<typeof socketConnection_>;
+  // let socketConnection = useRef(socketConnection_(user.usertoken))
   // useEffect(()=>{
-  //   if(socketConnection.connected){
+  //   if(socketConnection.current.connected){
   //     dispatch(connectSocket())
   //   }else{
   //     dispatch(disconnectSocket())
   //   }
   // },[])
   
-useEffect(()=>{
-  socketConnection = socketConnection_(user.usertoken)
+// useEffect(()=>{
+//   socketConnection.current.on("connect", () => {
+//       console.log("Socket ID from con:", socketConnection.current.id);
+//       dispatch(connectSocket())
+//     });
 
-  socketConnection.on("connect", () => {
-      console.log("Socket ID from con:", socketConnection.id);
-      dispatch(connectSocket())
-    });
+//     socketConnection.current.on("disconnect", () => {
+//       console.log('disconnected')
+//       dispatch(disconnectSocket())
+//      });
 
-    socketConnection.on("disconnect", () => {
-      console.log('disconnected')
-      dispatch(disconnectSocket())
-     });
-
-     socketConnection.on("reconnect", () => {
-      console.log('reconnecting')
+//      socketConnection.current.on("reconnect", () => {
+//       console.log('reconnecting')
       
-     });
-    //  dispatch(disconnectSocket())
+//      });
+//      dispatch(disconnectSocket())
 
-},[])
+// },[])
 
 
-  useEffect(() => {
-    console.log(socketState)
-    if(user.logedin){
-        if(!socketState.connected){
-          console.log('try toconnect socket')
-            socketConnection = socketConnection_(user.usertoken)
+//   useEffect(() => {
+//     console.log(socketState)
+//     if(user.logedin){
+//         if(!socketState.connected){
+//           console.log('try toconnect socket')
+//             // socketConnection = socketConnection_(user.usertoken)
 
-          // connect to socket server
-          // console.log('inside if')
-            // socketConnection.connect();
-            // socketConnection.emit("authenticate", { token: user.usertoken });
-        }else{
-          // send token to server
+//           // connect to socket server
+//           // console.log('inside if')
+//              socketConnection.current.connect();
+//             // socketConnection.current.emit("authenticate", { token: user.usertoken });
+//         }else{
+//           // send token to server
           
-          // socketConnection.emit("authenticate", { token: user.usertoken });
-        }
-    }
+//           // socketConnection.current.emit("authenticate", { token: user.usertoken });
+//         }
+//     }
 
-    // if(socketConnection){
+//     // if(socketConnection){
 
-    //   socketConnection.on("connect", () => {
-    //   console.log("Socket ID from con:", socketConnection.id);
-    //   dispatch(connectSocket())
-    // });
-    // socketConnection.on("disconnect", () => {
-    //   console.log('disconnected')
-    //   dispatch(disconnectSocket())
-    // });
+//     //   socketConnection.current.on("connect", () => {
+//     //   console.log("Socket ID from con:", socketConnection.current.id);
+//     //   dispatch(connectSocket())
+//     // });
+//     // socketConnection.current.on("disconnect", () => {
+//     //   console.log('disconnected')
+//     //   dispatch(disconnectSocket())
+//     // });
 
-    // }
+//     // }
 
-  }, [user, socketState]);
+//   }, [user, socketState]);
 
   const ProfileButton = () => {
     const imageSource = user.profile_image

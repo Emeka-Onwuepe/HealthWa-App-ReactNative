@@ -1,23 +1,193 @@
-import React, { useEffect, useState } from 'react';
+import { setSocketData } from '@/integrations/features/socket/socketSlice';
+import { useAppDispatch, useAppSelector } from '@/integrations/hooks';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { mediaDevices, MediaStream, RTCView } from 'react-native-webrtc';
+import {
+    MediaStream,
+    RTCPeerConnection,
+    // RTCSessionDescription,
+    RTCView
+} from 'react-native-webrtc';
+import {
+    getLocalStream
+} from '../../integrations/features/user/videoCallFunc';
+
 
 const VideoCall = () => {
+
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
     const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
+    const dispatch = useAppDispatch();
+    const user = useAppSelector(state => state.user);
+    const socketState = useAppSelector(state => state.socket);
+
+    
+
+    const configuration = { iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                ],
+                iceCandidatePoolSize: 10,
+        };      
+    
+     // Create peer connection
+    const peerConnection = useRef(new RTCPeerConnection(configuration));
+
+
+   
+    useEffect(() => {
+
+        peerConnection.current.ontrack = (event: RTCTrackEvent) => {
+        
+        if (event.streams && event.streams[0]) {
+            console.log('Remote track received.');
+            console.log('event.streams[0]:', event.streams[0]);
+            setRemoteStream(event.streams[0]);
+        } else {
+            console.log('No streams in event, creating new MediaStream.');
+            let inboundStream = new MediaStream();
+            inboundStream.addTrack(event.track);
+            setRemoteStream(inboundStream);
+        }
+        };
+
+         peerConnection.current.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
+        if (event.candidate) {
+            // console.log('New ICE candidate:', event.candidate);
+            // Here you would typically send the candidate to the remote peer
+            // add to remote peer connection
+            if(!event.candidate) return;
+            console.log('Sending ICE candidate to remote peer:', event.candidate);
+            dispatch(setSocketData({type:'new-ice-candidate', action:'candidate-sent', 
+                data:{candidate: JSON.stringify(event.candidate),
+                to: 71
+                }}));
+
+
+            // check for remote description
+            
+            // if (peerConnection.current.remoteDescription) {
+            //     peerConnection.current.addIceCandidate(event.candidate).then(() => {
+            //         console.log('Added ICE candidate:', event.candidate);
+            //     }).catch(error => {
+            //         console.log('Error adding ICE candidate:', error);
+            //     });
+            // } else {
+            //     console.log('Remote description not set yet. Cannot add ICE candidate.');
+            // }
+        }   
+    };
+
+    peerConnection.current.oniceconnectionstatechange = (event: Event) => {
+        console.log('################################');
+        console.log('iceconnectionstatechange event:', event);
+        console.log('ICE connection state:', peerConnection.current.iceConnectionState);
+        console.log('################################');
+    };
+    peerConnection.current.onconnectionstatechange = (event: Event) => {
+        console.log('--------------------------------');
+        console.log('connectionstatechange event:', event);
+        console.log('Connection state change:', peerConnection.current.connectionState);
+        console.log('--------------------------------');
+    };
+    
+    getLocalStream(setLocalStream, peerConnection);
+
+
+        // Get local stream
+
+        // Create offer
+        // createOffer(peerConnection, setOfferSDP);
+         peerConnection.current.createOffer({ offerToReceiveVideo: true, offerToReceiveAudio: true }).then(offer => {
+                // console.log('Offer SDP:', offer);
+                // setOfferSDP(JSON.stringify(offer));
+                peerConnection.current.setLocalDescription(offer).then(() => {
+                    // Send offer to remote peer via websockets
+                    dispatch(setSocketData({type:'video-offer', action:'offer-sent', 
+                        data:{offerSDP: JSON.stringify(offer), to:71}}));
+                });
+            });
+
+        // Handle ICE candidates
+
+    },[]);
+
 
     useEffect(() => {
-        // Get user media (local stream)
-        mediaDevices.getUserMedia({
-            audio: true,
-            video: true,
-        }).then(stream => {
-            setLocalStream(stream);
-            // In a real app, signaling would be used to exchange streams
-            // For demo, we simulate remote stream as local stream
-            // setRemoteStream(stream);
-        });
-    }, []);
+
+        if (socketState.data.type === 'video-offer' && socketState.data.action === 'offer-received') {
+            const offerSDP = socketState.data.data.offerSDP;
+            if (offerSDP) {
+                console.log('Received offer SDP via socket:');
+                peerConnection.current.setRemoteDescription(JSON.parse(offerSDP)).then(() => {
+                    console.log('Remote description set with offer SDP');
+                }
+                ).catch(error => {
+                    console.error('Error setting remote description with offer SDP:', error);
+                });
+            }
+        }
+
+// have a second look
+
+        if (socketState.data.type === 'new-ice-candidate' && socketState.data.action === 'candidate-received') {
+            const candidateData = socketState.data.data.candidate;
+            if (candidateData) {
+                const candidate = new RTCIceCandidate(JSON.parse(candidateData));
+                peerConnection.current.addIceCandidate(candidate).then(() => {
+                    console.log('Added ICE candidate:', candidate);
+                }).catch(error => {
+                    console.error('Error adding ICE candidate:', error);
+                });
+            }
+        }
+
+        if (socketState.data.type === 'video-answer' && socketState.data.action === 'answer-received') {
+            const answerSDP = socketState.data.data.answerSDP;
+            if (answerSDP) {
+                console.log('Received answer SDP via socket:');
+                peerConnection.current.setRemoteDescription(JSON.parse(answerSDP)).then(() => {
+                    console.log('Remote description set with answer SDP');
+                }).catch(error => {
+                    console.error('Error setting remote description with answer SDP:', error);
+                });
+            }
+        }
+
+    }, [socketState]);
+
+    // useEffect(() => {
+
+    //         // Handle remote stream
+    //         // console.log('Offer SDP cc:', offerSDP)
+    //         if(offerSDP){
+    //          // Create answer
+    //         //  console.log('peerConnection before createAnswer:', peerConnection);
+    //         //  create answer and add to peer connection
+    //         peerConnection.current.setRemoteDescription(JSON.parse(offerSDP)).then(() => {
+    //             console.log('Remote description set successfully');
+    //             console.log('peerConnection after createAnswer:', peerConnection);
+
+    //             // return createAnswer(peerConnection, setRemoteStream);
+    //         }).catch(error => {
+    //             console.error('Error setting remote description:', error);
+    //         });
+
+    //         peerConnection.current.createAnswer().then(answer => {
+    //             // console.log('Answer SDP:', answer);
+    //             peerConnection.current.setLocalDescription(answer).then(() => {
+    //                 // Send answer to remote peer via websockets
+    //             }
+    //         );
+    //         })
+
+    //         // handleRemoteStream(peerConnection, setRemoteStream);
+    //         }
+            
+    // }, [offerSDP]);
+
+
+
+
 
     return (
         <View style={styles.container}>
@@ -41,6 +211,7 @@ const VideoCall = () => {
         </View>
     );
 };
+
 
 
 const styles = StyleSheet.create({
