@@ -11,7 +11,18 @@ const initialData = {
     offerSDP:"",
     candidate:"",
     to: 0,
-  }}
+  }},
+  incoming:{type:"",
+    action:"",
+    data:{
+    message: "",
+    answerSDP:"",
+    offerSDP:"",
+    candidate:"",
+    pendingCandidates: [],
+    to: 0,
+  }},
+
 }
 
 export const get_initial_socket_data = async () => {
@@ -47,9 +58,23 @@ export const socketSlice = createSlice({
       writeToAsyncStorage("socket", state)
     },
 
-    clearSocketData: (state) => {
-      state.data.type = ""
-      state.data.action = ""
+    clearSocketData: (state,action) => {
+      console.log("Clearing socket data for:", action.payload)
+      const payload = action.payload
+      const clear = action.payload.clear
+      if(state[clear][payload.attr] == payload.data){
+        state[clear][payload.attr] = ""
+        state[clear].action = ""
+        state[clear].type = ""
+
+      }
+      writeToAsyncStorage("socket", state)
+    },
+    setSocketIncoming: (state, action) => {
+      console.log('data recieved in incoming state')
+      state.incoming.type = action.payload.type
+      state.incoming.action = action.payload.action
+      state.incoming.data = {...state.incoming.data,...action.payload.data}
       writeToAsyncStorage("socket", state)
     },
 
@@ -60,6 +85,7 @@ export const socketSlice = createSlice({
 });
 
 export const { connectSocket, disconnectSocket, 
-  loadSocketData,clearSocketData,setSocketData } = socketSlice.actions;
+  loadSocketData,clearSocketData,setSocketData, 
+  setSocketIncoming } = socketSlice.actions;
 
 export default socketSlice.reducer;

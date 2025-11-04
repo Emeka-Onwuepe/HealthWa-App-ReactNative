@@ -1,5 +1,8 @@
 import { base_url } from "@/integrations/features/apis/apiSlice";
-import { connectSocket, disconnectSocket } from "@/integrations/features/socket/socketSlice";
+import {
+    connectSocket, disconnectSocket,
+    setSocketIncoming
+} from "@/integrations/features/socket/socketSlice";
 import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
 import { useEffect, useRef } from "react";
 import { View } from "react-native";
@@ -24,17 +27,51 @@ export default function SocketFeature() {
         return connection
         }
 
+    let attr = ''
+
 
     useEffect(() => {
+
+    if(!user.logedin && socket.current){
+        socket.current.disconnect();
+        socket.current = null;
+        dispatch(disconnectSocket());
+    }
+
+    if(socket.current){
+    if(socketState.connected && socket.current.readyState < 1){
+        console.log("Socket not connected, updating state...");
         dispatch(disconnectSocket())
-    }, []);
+    }
+    }
+    
+    if(user.logedin && !socket.current && socketState.connected){
+        dispatch(disconnectSocket())
+
+    }
+
+   if (socket.current && user.logedin) {
+    console.log('con 1',socket.current.connected)
+    console.log('con 2',socketState.connected)
 
 
-
-    useEffect(() => {
-    if (user.logedin && !socketState.connected) {
-        socket.current = socketConnection(user.usertoken);
+    if (socket.current.readyState === 1 && !socketState.connected) {
+        console.log("Socket is already connected.");
         dispatch(connectSocket());
+    }
+    else if(socket.current.readyState === 0 && !socketState.connected){
+        console.log("Reconnecting socket...");
+        socket.current.connect();
+        dispatch(connectSocket());
+    }
+    }
+
+    if (user.logedin && !socket.current) {
+        console.log("Initializing socket connection...");
+        dispatch(disconnectSocket())
+        socket.current = socketConnection(user.usertoken);
+        console.log("Socket initialized:", socket.current.connected);
+        // dispatch(connectSocket());
 
     socket.current.on("connect", () => {
       console.log("Socket ID from con:", socket.current.id);
@@ -50,6 +87,13 @@ export default function SocketFeature() {
       console.log('reconnecting')
           });
 
+    socket.current.on('success', (message) => {
+      console.log("Success message from socket:", message);
+    });
+
+    socket.current.on('error', (error) => {
+      console.error("Error message from socket:", error);
+    });
 
     // socket.current.on('connect_error', (err) => {
     //   console.log(`Connection error: ${err.message}`);  
@@ -57,23 +101,35 @@ export default function SocketFeature() {
     //  });
 
      socket.current.on('video-offer', (data) => {
-        console.log("Received video-offer via socket:", data);
+        console.log("Received video-offer via socket:");
         // Handle the received offer (e.g., set remote description)
-        dispatch(setSocketData({type:'video-offer', action:'offer-received', data:{offerSDP: data.offerSDP, from:data.from}}));
+        dispatch(setSocketIncoming({type: data.type, action: data.action, data:{offerSDP: data.offerSDP, from:data.from}}));
     });
 
      socket.current.on('video-answer', (data) => {
-        console.log("Received video-answer via socket:", data);
+        console.log("Received video-answer via socket:");
         // Handle the received answer (e.g., set remote description)
-        dispatch(setSocketData({type:'video-answer', action:'answer-received', data:{answerSDP: data.answerSDP}}));
+        dispatch(setSocketIncoming({type: data.type, action:data.action, data:{answerSDP: data.answerSDP}}));
+    });
+
+    socket.current.on('new-ice-candidate', (data) => {
+        // console.log("Received new-ice-candidate via socket:");
+        // Handle the received answer (e.g., set remote description)
+        dispatch(setSocketIncoming({type: data.type, action: data.action, data:{candidate: data.candidate}}));
     });
 
     //  dispatch(disconnectSocket())
+    
 
-  }
+}
+
+
 }, [user, socketState.connected]);
 
-
+const selector = {offerSDP: "video-offer",
+                    answerSDP: "video-answer",
+                    candidate: "new-ice-candidate"}
+                    
 
 
 useEffect(() => {
@@ -81,16 +137,40 @@ useEffect(() => {
 console.log("Socket state changed -->", socketState.connected);
 
 if(socketState.data.type !== "" && socketState.data.type !== ""){
-    console.log("New socket data received:", socketState.data.type);
+    console.log("New socket data added:", socketState.data.type);
+    for (const key in selector) {
+        if(selector[key] === socketState.data.type){
+            attr = key
+        }
+    }
 
-    socket.current.emit(socketState.data.type, {
+    const socketEmit = socket.current.emit(socketState.data.type, {
         action: socketState.data.action,
         data: socketState.data.data
-    });
-
+    }
+    , 
+    ( res) => {
+        if(res.status === "ok"){
+            console.log(`Emitted ${socketState.data.type} event successfully.`);
+            dispatch(clearSocketData({attr, data:socketState.data.data[attr], clear:'data'}));
+        } else {
+            console.log(`Error response for ${socketState.data.type} event:`, res);
+        }
+    }
+);
+// socketEmit.on("error", (error) => {
+//     console.error(`Error emitting ${socketState.data.type} event:`, error);
+// });
+// console.log(socketEmit)
+// socketEmit.on("success", (response) => {
+//     console.log(`Success response for ${socketState.data.type} event:`, response);
+//     console.log(`Emitted ${socketState.data.type} event successfully.`);
+//     dispatch(clearSocketData({attr, data:socketState.data.data[attr], clear:'data'}));
+// });
+// console.log(socketEmit," emitted via socket.");
 }
 
- }, [socketState]);
+ }, [socketState.data]);
 
 
     return (   

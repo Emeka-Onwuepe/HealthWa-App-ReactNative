@@ -50,13 +50,13 @@ const VideoCall = () => {
         }
         };
 
-         peerConnection.current.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
+        peerConnection.current.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
         if (event.candidate) {
             // console.log('New ICE candidate:', event.candidate);
             // Here you would typically send the candidate to the remote peer
             // add to remote peer connection
             if(!event.candidate) return;
-            console.log('Sending ICE candidate to remote peer:', event.candidate);
+            console.log('Sending ICE candidate to socketState:', event.candidate);
             dispatch(setSocketData({type:'new-ice-candidate', action:'candidate-sent', 
                 data:{candidate: JSON.stringify(event.candidate),
                 to: 71
@@ -113,13 +113,28 @@ const VideoCall = () => {
 
 
     useEffect(() => {
+        console.log('data recieved from socket.imcoming')
 
-        if (socketState.data.type === 'video-offer' && socketState.data.action === 'offer-received') {
-            const offerSDP = socketState.data.data.offerSDP;
+        if (socketState.incoming.type === 'video-offer' && socketState.incoming.action === 'offer-received') {
+            const offerSDP = socketState.incoming.data.offerSDP;
             if (offerSDP) {
-                console.log('Received offer SDP via socket:');
+                console.log('Received offer video-offer via socket:');
+
+                // send call notification
+
+                // 
+
                 peerConnection.current.setRemoteDescription(JSON.parse(offerSDP)).then(() => {
                     console.log('Remote description set with offer SDP');
+                    // Create answer
+                    peerConnection.current.createAnswer().then(answer => {
+                        console.log('Created answer SDP:');
+                        peerConnection.current.setLocalDescription(answer).then(() => {
+                            // Send answer to remote peer via websockets
+                            dispatch(setSocketData({type:'video-answer', action:'answer-sent', 
+                                data:{answerSDP: JSON.stringify(answer), to:71}}));
+                        });
+                    });
                 }
                 ).catch(error => {
                     console.error('Error setting remote description with offer SDP:', error);
@@ -129,8 +144,9 @@ const VideoCall = () => {
 
 // have a second look
 
-        if (socketState.data.type === 'new-ice-candidate' && socketState.data.action === 'candidate-received') {
-            const candidateData = socketState.data.data.candidate;
+        if (socketState.incoming.type === 'new-ice-candidate' && socketState.incoming.action === 'candidate-received') {
+            console.log('adding new ice candidate')
+            const candidateData = socketState.incoming.data.candidate;
             if (candidateData) {
                 const candidate = new RTCIceCandidate(JSON.parse(candidateData));
                 peerConnection.current.addIceCandidate(candidate).then(() => {
@@ -141,8 +157,8 @@ const VideoCall = () => {
             }
         }
 
-        if (socketState.data.type === 'video-answer' && socketState.data.action === 'answer-received') {
-            const answerSDP = socketState.data.data.answerSDP;
+        if (socketState.incoming.type === 'video-answer' && socketState.incoming.action === 'answer-received') {
+            const answerSDP = socketState.incoming.data.answerSDP;
             if (answerSDP) {
                 console.log('Received answer SDP via socket:');
                 peerConnection.current.setRemoteDescription(JSON.parse(answerSDP)).then(() => {
@@ -153,7 +169,7 @@ const VideoCall = () => {
             }
         }
 
-    }, [socketState]);
+    }, [socketState.incoming]);
 
     // useEffect(() => {
 
