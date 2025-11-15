@@ -14,7 +14,6 @@ export default function SplashScreen() {
   const [timout,setTimeOut] = useState(false)
     
     useEffect(() => {
-      console.log('board state:', board);
       if (user.logedin && timout) {
         if (user.verified_email  && user.gender != 'other') {
           navigation.replace("/home");

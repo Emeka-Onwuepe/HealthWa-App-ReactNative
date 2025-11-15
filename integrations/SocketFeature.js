@@ -4,26 +4,46 @@ import {
     setSocketIncoming
 } from "@/integrations/features/socket/socketSlice";
 import { useAppDispatch, useAppSelector } from "@/integrations/hooks";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { View } from "react-native";
 import { io } from "socket.io-client";
 
 export default function SocketFeature() {
-    console.log("SocketFeature rendered");
+    // console.log("SocketFeature rendered");
     let socket = useRef(null);
 
     const dispatch = useAppDispatch();
     const user = useAppSelector(state => state.user);
     const socketState = useAppSelector(state => state.socket);
+    const [tokenChanged,setTokenChanged] = useState(true)
+    const [token,setToken] = useState('')
+
 
     const socketConnection = (token)  =>{
     const connection = io(base_url,{
+        // transports: ['websocket'],
         reconnectionDelayMax: 10000,
         auth: {
             token
         }
         });
+        connection.on("connect_error", (err) => {
+            console.log("Socket connect_error:", err.message);
+            console.log("Socket connect_error:", err.cause);
+             console.log("Socket connect_error:", err.name);
 
+
+
+        });
+        
+
+        connection.on("reconnect_error", (err) => {
+            console.log("Socket reconnect_error:", err);
+        });
+
+        connection.on("error", (err) => {
+            console.log("Socket error:", err);
+        });
         return connection
         }
 
@@ -32,10 +52,15 @@ export default function SocketFeature() {
 
     useEffect(() => {
 
-    if(!user.logedin && socket.current){
-        socket.current.disconnect();
-        socket.current = null;
-        dispatch(disconnectSocket());
+    // if(!user.logedin && socket.current){
+    //     socket.current.disconnect();
+    //     socket.current = null;
+    //     dispatch(disconnectSocket());
+    // }
+
+    if(token != '' && token != user.usertoken){
+        setToken(user.usertoken)
+        setTokenChanged(true)
     }
 
     if(socket.current){
@@ -47,12 +72,11 @@ export default function SocketFeature() {
     
     if(user.logedin && !socket.current && socketState.connected){
         dispatch(disconnectSocket())
-
     }
 
    if (socket.current && user.logedin) {
-    console.log('con 1',socket.current.connected)
-    console.log('con 2',socketState.connected)
+        // console.log('con 1',socket.current.connected)
+        // console.log('con 2',socketState.connected)
 
 
     if (socket.current.readyState === 1 && !socketState.connected) {
@@ -66,11 +90,18 @@ export default function SocketFeature() {
     }
     }
 
-    if (user.logedin && !socket.current) {
+    if ((user.logedin && !socket.current) && tokenChanged) {
         console.log("Initializing socket connection...");
         dispatch(disconnectSocket())
+        if(token != '' && socket.current.connected ){
+            socket.current.disconnect()
+        }
         socket.current = socketConnection(user.usertoken);
         console.log("Socket initialized:", socket.current.connected);
+        if(token == ''){
+            setToken(user.usertoken)
+        }
+        setTokenChanged(false)
         // dispatch(connectSocket());
 
     socket.current.on("connect", () => {
@@ -101,13 +132,16 @@ export default function SocketFeature() {
     //  });
 
      socket.current.on('video-offer', (data) => {
-        console.log("Received video-offer via socket:");
+        // console.log("Received video-offer via socket from :",data.from);
         // Handle the received offer (e.g., set remote description)
-        dispatch(setSocketIncoming({type: data.type, action: data.action, data:{offerSDP: data.offerSDP, from:data.from}}));
+        // dispatch(setReceiver({type:'id',id: data.from }))
+        dispatch(setSocketIncoming({type: data.type, action: data.action,
+                                    reciever : {type:'id',id: data.from },
+                                    data:{offerSDP: data.offerSDP, from:data.from}}));
     });
 
      socket.current.on('video-answer', (data) => {
-        console.log("Received video-answer via socket:");
+        // console.log("Received video-answer via socket:");
         // Handle the received answer (e.g., set remote description)
         dispatch(setSocketIncoming({type: data.type, action:data.action, data:{answerSDP: data.answerSDP}}));
     });
@@ -115,7 +149,7 @@ export default function SocketFeature() {
     socket.current.on('new-ice-candidate', (data) => {
         // console.log("Received new-ice-candidate via socket:");
         // Handle the received answer (e.g., set remote description)
-        dispatch(setSocketIncoming({type: data.type, action: data.action, data:{candidate: data.candidate}}));
+        dispatch(setSocketIncoming({type: data.type, action: data.action, from: data.from, data:{candidate: data.candidate}}));
     });
 
     //  dispatch(disconnectSocket())
@@ -124,7 +158,7 @@ export default function SocketFeature() {
 }
 
 
-}, [user, socketState.connected]);
+}, [user, socketState.connected,tokenChanged]);
 
 const selector = {offerSDP: "video-offer",
                     answerSDP: "video-answer",
@@ -137,7 +171,8 @@ useEffect(() => {
 console.log("Socket state changed -->", socketState.connected);
 
 if(socketState.data.type !== "" && socketState.data.type !== ""){
-    console.log("New socket data added:", socketState.data.type);
+    // console.log("New socket data added:", socketState.data.type);
+
     for (const key in selector) {
         if(selector[key] === socketState.data.type){
             attr = key
@@ -146,12 +181,14 @@ if(socketState.data.type !== "" && socketState.data.type !== ""){
 
     const socketEmit = socket.current.emit(socketState.data.type, {
         action: socketState.data.action,
-        data: socketState.data.data
+        [attr]: socketState.data.data[attr] ,
+        to: socketState.data.data.to,
+        type:socketState.data.type
     }
     , 
     ( res) => {
         if(res.status === "ok"){
-            console.log(`Emitted ${socketState.data.type} event successfully.`);
+            // console.log(`Emitted ${socketState.data.type} event successfully.`);
             dispatch(clearSocketData({attr, data:socketState.data.data[attr], clear:'data'}));
         } else {
             console.log(`Error response for ${socketState.data.type} event:`, res);

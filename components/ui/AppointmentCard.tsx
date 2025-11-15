@@ -110,7 +110,8 @@ export default function AppointmentCard({appointment}: {appointment: Appointment
         {status.toLowerCase() === "ongoing" && (
           <Pressable
             style={styles.callButton}
-            onPress={() => navigation.navigate("/videoCall")}
+            onPress={() => navigation.navigate({pathname:'/videoCall',
+              params:{calltype:'caller',id:72}})}
           >
             <Ionicons name="videocam" size={20} color="#0B8AA0" />
             <Text style={styles.callText}>Join Call </Text>

@@ -4,6 +4,7 @@ import { Stack } from "expo-router";
 import React from "react";
 import { Provider } from "react-redux";
 import ToastManager from "toastify-react-native";
+import CallReciever from '../integrations/CallReciever';
 import SocketFeature from "../integrations/SocketFeature";
 
 export default function RootLayout() {
@@ -17,6 +18,7 @@ export default function RootLayout() {
         }}
       ></Stack>
       <Alert_System />
+      <CallReciever />
       <SocketFeature />
     </Provider>
   );

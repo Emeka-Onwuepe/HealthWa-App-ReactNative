@@ -1,21 +1,18 @@
-import {
-    mediaDevices
-} from 'react-native-webrtc';
 
 
-export const getLocalStream = async (setLocalStream, peerConnection) => {
-            const stream = await mediaDevices.getUserMedia({
-                audio: true,
-                video: { facingMode: 'user' },
-            });
-            
-            setLocalStream(stream);
-            // Add local stream tracks to peer connection
-            for (const track of stream.getTracks()) {
-                // console.log("Adding local track to peer connection: ", track);
-                peerConnection.current.addTrack(track, stream);
-            }
-        };
+// export const getLocalStream = async (setLocalStream, peerConnection) => {
+//             const stream = await mediaDevices.getUserMedia({
+//                 audio: true,
+//                 video: true,
+//             });
+//              for (const track of stream.getTracks()) {
+//                 console.log(" ---------->>>>>>> Adding local track to peer connection: ");
+//                 peerConnection.current.addTrack(track, stream);
+//             }
+//             setLocalStream(stream);
+//             // setRemoteStream(stream)
+//             // Add local stream tracks to peer connection
+//         };
 
 // export const handleRemoteStream = (peerConnection, setRemoteStream,) => {
 //     if (!peerConnection){
