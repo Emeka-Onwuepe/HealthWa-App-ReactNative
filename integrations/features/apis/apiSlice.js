@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 // Define a service using a base URL and expected endpoints
 // export const base_url = 'https://health-wa-git-main-emeka-s-projects-2df9bd2a.vercel.app'
 // export const base_url = 'http://localhost:5000'
-export const base_url = "https://deb4733b96c4.ngrok-free.app"
+export const base_url = "https://6f33c11d56c2.ngrok-free.app"
 export const baseUrl = `${base_url}/api`
 // export const baseUrl = 'https://health-wa-git-main-emeka-s-projects-2df9bd2a.vercel.app/api'
 
