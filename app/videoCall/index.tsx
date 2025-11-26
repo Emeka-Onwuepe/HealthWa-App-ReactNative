@@ -136,7 +136,7 @@ const VideoCall = () => {
                 dispatch(clearSocketData({attr:'candidate', data:candidateData, clear:'incoming'}));
 
                 }).catch(error => {
-                    console.log('Error adding ICE candidate:', error);
+                    console.log(calltype,'Error adding ICE candidate:', error);
                     err = true 
                 });
 

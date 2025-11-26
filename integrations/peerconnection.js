@@ -119,12 +119,13 @@ export const start_call = async (peerConnection,configuration,
 
             const offer = await pc.createOffer({offerToReceiveAudio:true, offerToReceiveVideo:true});
             if(offer){
-                await pc.setLocalDescription(offer)
-                // console.log('offer created')
                 dispatch(setSocketData({type:'video-offer', action:'offer-sent', 
                                 data:{offerSDP: JSON.stringify(offer),
                                      to: {type:'id',id:parseInt(id)}
                                     }}));
+                                    
+                await pc.setLocalDescription(offer)
+                // console.log('offer created')
             }else{
                 console.log('offer not created')
             } 
@@ -165,6 +166,9 @@ export const acceptCall = async (peerConnection,configuration,
                     console.log('Answer SDP contains video information');
                 }
                 // console.log('Created answer SDP:' );
+                dispatch(setSocketData({type:'video-answer', action:'answer-sent', 
+                         data:{answerSDP: JSON.stringify(answer), to: socketState.reciever}}));
+
                 await pc.setLocalDescription(answer)
                             // Send answer to remote peer via websockets
                 
@@ -184,8 +188,6 @@ export const acceptCall = async (peerConnection,configuration,
                 }
                 })
 
-                dispatch(setSocketData({type:'video-answer', action:'answer-sent', 
-                         data:{answerSDP: JSON.stringify(answer), to: socketState.reciever}}));
             }
 
     }
